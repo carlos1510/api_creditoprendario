@@ -15,6 +15,15 @@ class CreateSaldoalquilerTable extends Migration
     {
         Schema::create('saldoalquiler', function (Blueprint $table) {
             $table->id();
+            $table->integer('pagoalquilerid');
+            $table->integer('empresasid');
+            $table->date('fechainicio');
+            $table->date('fechafinal');
+            $table->integer('saldo');
+            $table->integer('estadoactivacion')->nullable();
+            $table->integer('estadopago')->nullable();
+            $table->integer('estadomora')->nullable();
+            $table->boolean('estado');
             $table->timestamps();
         });
     }

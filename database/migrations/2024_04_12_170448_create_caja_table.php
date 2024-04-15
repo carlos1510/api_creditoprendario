@@ -15,6 +15,18 @@ class CreateCajaTable extends Migration
     {
         Schema::create('caja', function (Blueprint $table) {
             $table->id();
+            $table->integer('usersid');
+            $table->integer('empresasid');
+            $table->date('fechaapertura');
+            $table->string('horaapertura', 10);
+            $table->double('montoinicial');
+            $table->date('fechacierre')->nullable();
+            $table->string('horacierre', 10)->nullable();
+            $table->double('montocobro')->nullable();
+            $table->double('montocredito')->nullable();
+            $table->double('montogasto')->nullable();
+            $table->double('montocierre')->nullable();
+            $table->integer('estado');
             $table->timestamps();
         });
     }
