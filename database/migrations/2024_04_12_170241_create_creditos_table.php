@@ -34,7 +34,8 @@ class CreateCreditosTable extends Migration
             $table->double('descuento');
             $table->double('montoactual');
             $table->integer('usersid');
-            $table->integer('estado');
+            $table->string('estados');
+            $table->boolean('estado');
             $table->timestamps();
         });
     }
