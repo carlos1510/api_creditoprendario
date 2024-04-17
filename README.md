@@ -40,7 +40,15 @@
     EJECUTAMOS LAS MIGRACIONES PARA LA CREACION DE LAS TABLAS
 
     php artisan migrate
-    
-    o
 
-    php artisan migrate --seed
+    php artisan db:seed
+
+7: Generar la clave secreta de JWT
+    
+    php artisan jwt:secret
+
+8: Ejecutar el proyecto
+
+    php artisan serve
+
+9:
