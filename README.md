@@ -8,7 +8,7 @@
 2: Permisos de escritura
     Después de instalar Laravel, tal vez debas configurar algunos permisos, Los directorios entre storage y la carpeta bootstrap/cache deben tener permisos de escritura por el servidor web.
 
-    sudo chmod -R 755 storage
+    sudo chmod -R 777 storage
 
 3: Instalando las dependencias
     
