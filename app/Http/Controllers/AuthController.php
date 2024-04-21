@@ -114,6 +114,8 @@ class AuthController extends Controller
         $user->acceso = $request->acceso;
         $user->rol = $request->rol;
 
+        $user->empresa_id = $request->has('empresa_id') ? $request->empresa_id : null;
+
         $user->save();
 
         return response()->json([

@@ -13,17 +13,23 @@ class CreateSaldoalquilerTable extends Migration
      */
     public function up()
     {
-        Schema::create('saldoalquiler', function (Blueprint $table) {
+        Schema::create('saldo_alquiler', function (Blueprint $table) {
             $table->id();
-            $table->integer('pagoalquilerid');
-            $table->integer('empresasid');
-            $table->date('fechainicio');
-            $table->date('fechafinal');
+            $table->date('fecha_inicio');
+            $table->date('fecha_final');
             $table->integer('saldo');
             $table->integer('estadoactivacion')->nullable();
             $table->integer('estadopago')->nullable();
             $table->integer('estadomora')->nullable();
             $table->boolean('estado');
+
+            $table->unsignedBigInteger('pago_alquiler_id')->nullable();
+
+            $table->foreign("pago_alquiler_id")
+                ->references("id")
+                ->on("pago_alquiler")
+                ->onDelete('set null');
+
             $table->timestamps();
         });
     }
@@ -35,6 +41,6 @@ class CreateSaldoalquilerTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('saldoalquiler');
+        Schema::dropIfExists('saldo_alquiler');
     }
 }

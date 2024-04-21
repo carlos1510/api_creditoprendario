@@ -17,14 +17,16 @@ class CreateEmpresasTable extends Migration
             $table->id();
             $table->string('nombre', 100);
             $table->string('numerodocumento', 15);
-            $table->string('email', 100);
-            $table->string('direccion');
-            $table->string('telefono', 15);
-            $table->string('rutaimagen');
-            $table->integer('gps');
+            $table->string('email', 100)->nullable();
+            $table->string('direccion')->nullable();
+            $table->string('telefono', 15)->nullable();
+            $table->string('rutaimagen')->nullable();
+            $table->integer('gps')->nullable();
             $table->string('tipomoneda', 15);
             $table->string('simbolomoneda', 5);
+
             $table->boolean('estado');
+
             $table->timestamps();
         });
     }

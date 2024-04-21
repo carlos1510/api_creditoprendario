@@ -25,6 +25,12 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->integer('acceso');
             $table->string('rol');
+            $table->unsignedBigInteger('empresa_id')->nullable();
+
+            $table->foreign("empresa_id")
+                ->references("id")
+                ->on("empresas")
+                ->onDelete('set null');
             $table->rememberToken();
             $table->timestamps();
         });

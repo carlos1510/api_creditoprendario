@@ -20,8 +20,13 @@ class CreateServiciosTable extends Migration
             $table->string("periodo", 25);
             $table->integer("numeroperiodo");
             $table->double("porcentaje");
-            $table->integer("empresasid");
             $table->boolean("estado");
+            $table->unsignedBigInteger("empresa_id")->nullable();
+
+            $table->foreign("empresa_id")
+            ->references("id")
+            ->on("empresas")
+            ->onDelete('set null');
             $table->timestamps();
         });
     }

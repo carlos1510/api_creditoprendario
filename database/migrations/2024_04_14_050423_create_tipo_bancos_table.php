@@ -13,7 +13,7 @@ class CreateTipobancosTable extends Migration
      */
     public function up()
     {
-        Schema::create('tipobancos', function (Blueprint $table) {
+        Schema::create('tipo_bancos', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 100);
             $table->string('nombreabreviado', 15);
@@ -29,6 +29,6 @@ class CreateTipobancosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tipobancos');
+        Schema::dropIfExists('tipo_bancos');
     }
 }

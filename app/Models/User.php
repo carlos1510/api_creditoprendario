@@ -59,4 +59,25 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    //Relacion uno a muchos
+    public function clientes() {
+        return $this->hasMany('App\Models\Cliente');
+    }
+
+    public function empresa(){
+        return $this->belongsTo('App\Models\Empresa');
+    }
+
+    public function cajas(){
+        return $this->hasMany('App\Models\Caja');
+    }
+
+    public function pagoAlquier(){
+        return $this->hasMany('App\Models\PagoAlquiler');
+    }
+
+    public function pago() {
+        return $this->belongsTo('App\Models\Pago');
+    }
 }

@@ -13,17 +13,28 @@ class CreatePagoalquilerTable extends Migration
      */
     public function up()
     {
-        Schema::create('pagoalquiler', function (Blueprint $table) {
+        Schema::create('pago_alquiler', function (Blueprint $table) {
             $table->id();
-            $table->integer('tipobancosid');
             $table->string('numerooperacion', 15)->nullable();
             $table->date('fecha');
             $table->double('monto');
             $table->string('descripcion')->nullable();
             $table->string('rutaimagen')->nullable();
-            $table->integer('empresasid');
-            $table->integer('usersid');
             $table->boolean('estado');
+
+            $table->unsignedBigInteger('tipo_banco_id');
+            $table->unsignedBigInteger('user_id');
+
+            $table->foreign("tipo_banco_id")
+                ->references("id")
+                ->on("tipo_bancos")
+                ->onDelete('set null');
+
+            $table->foreign("user_id")
+                ->references("id")
+                ->on("users")
+                ->onDelete('set null');
+
             $table->timestamps();
         });
     }
@@ -35,6 +46,6 @@ class CreatePagoalquilerTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pagoalquiler');
+        Schema::dropIfExists('pago_alquiler');
     }
 }

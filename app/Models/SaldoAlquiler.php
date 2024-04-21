@@ -9,5 +9,9 @@ class SaldoAlquiler extends Model
 {
     use HasFactory;
 
-    protected $table = 'saldoalquiler';
+    //protected $table = 'saldoalquiler';
+
+    public function pagoAlquiler(){
+        return $this->belongsTo('App\Models\PagoAlquiler');
+    }
 }

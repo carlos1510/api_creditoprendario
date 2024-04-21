@@ -15,15 +15,34 @@ class CreatePagosTable extends Migration
     {
         Schema::create('pagos', function (Blueprint $table) {
             $table->id();
-            $table->integer('empresasid');
-            $table->integer('creditosid');
+            
             $table->date('fecha');
             $table->double('capital');
             $table->double('monto');
             $table->double('montorestante');
             $table->string('descripcion');
-            $table->integer('usersid');
+            
             $table->boolean('estado');
+
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('empresa_id')->nullable();
+            $table->unsignedBigInteger('credito_id')->nullable();
+
+            $table->foreign("user_id")
+            ->references("id")
+            ->on("users")
+            ->onDelete('set null');
+
+            $table->foreign("empresa_id")
+            ->references("id")
+            ->on("empresas")
+            ->onDelete('set null');
+
+            $table->foreign("credito_id")
+            ->references("id")
+            ->on("creditos")
+            ->onDelete('set null');
+
             $table->timestamps();
         });
     }
