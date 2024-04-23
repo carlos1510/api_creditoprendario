@@ -20,7 +20,7 @@ class CreateClientesTable extends Migration
             $table->string("nombrescliente", 150);
             $table->string("direccion")->nullable();
             $table->string("referencia")->nullable();
-            $table->string("felefono1", 25)->nullable();
+            $table->string("telefono1", 25)->nullable();
             $table->string("telefono2", 25)->nullable();
             $table->string("email", 100)->nullable();
             $table->double("latitud")->nullable();

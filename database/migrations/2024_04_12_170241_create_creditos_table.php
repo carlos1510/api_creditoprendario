@@ -37,6 +37,7 @@ class CreateCreditosTable extends Migration
             $table->unsignedBigInteger('cliente_id')->nullable();
             $table->unsignedBigInteger('tipo_comprobante_id')->nullable();
             $table->unsignedBigInteger('servicio_id')->nullable();
+            $table->unsignedBigInteger('empresa_id')->nullable();
 
             $table->foreign("user_id")
             ->references("id")
@@ -51,6 +52,11 @@ class CreateCreditosTable extends Migration
             $table->foreign("tipo_comprobante_id")
             ->references("id")
             ->on("tipo_comprobantes")
+            ->onDelete('set null');
+
+            $table->foreign("empresa_id")
+            ->references("id")
+            ->on("empresas")
             ->onDelete('set null');
 
             $table->timestamps();

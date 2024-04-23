@@ -20,7 +20,7 @@ class CreatePagosTable extends Migration
             $table->double('capital');
             $table->double('monto');
             $table->double('montorestante');
-            $table->string('descripcion');
+            $table->string('descripcion')->nullable();
             
             $table->boolean('estado');
 

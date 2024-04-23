@@ -18,10 +18,8 @@ class CreateSaldoalquilerTable extends Migration
             $table->date('fecha_inicio');
             $table->date('fecha_final');
             $table->integer('saldo');
-            $table->integer('estadoactivacion')->nullable();
-            $table->integer('estadopago')->nullable();
-            $table->integer('estadomora')->nullable();
-            $table->boolean('estado');
+            $table->integer('estadoactivacion');
+            $table->integer('estadopago');
 
             $table->unsignedBigInteger('pago_alquiler_id')->nullable();
 

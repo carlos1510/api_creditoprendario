@@ -14,4 +14,8 @@ class Credito extends Model
     public function pago() {
         return $this->belongsTo('App\Models\Pago');
     }
+
+    public function empresa() {
+        return $this->belongsTo('App\Models\Empresa');
+    }
 }

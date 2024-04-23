@@ -30,4 +30,8 @@ class Empresa extends Model
     public function pago() {
         return $this->belongsTo('App\Models\Pago');
     }
+
+    public function creditos() {
+        return $this->hasMany('App\Models\Credito');
+    }
 }
