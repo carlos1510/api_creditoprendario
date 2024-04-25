@@ -1,6 +1,15 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CajaController;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\CreditoController;
+use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\PagoAlquilerController;
+use App\Http\Controllers\PagoController;
+use App\Http\Controllers\SaldoAlquilerController;
+use App\Http\Controllers\ServicioController;
+use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,3 +37,52 @@ Route::group([
     Route::post('me', [AuthController::class, 'me']);
     Route::post('register', [AuthController::class, 'register']);
 });
+
+//Cliente
+Route::get('clientes/{tipodocumento}&{numerodocumento}', [ClienteController::class, 'getByTipoDocumento']);
+
+//Empresa
+Route::get('empresas', [EmpresaController::class, 'index']);
+Route::get('empresas/{id}', [EmpresaController::class, 'show']);
+Route::post('empresas', [EmpresaController::class, 'store']);
+Route::put('empresas/{id}', [EmpresaController::class, 'update']);
+Route::delete('empresas/{id}', [EmpresaController::class, 'destroy']);
+
+//Caja
+Route::get('cajas', [CajaController::class, 'index']);
+Route::get('cajas/{id}', [CajaController::class, 'show']);
+Route::post('cajas', [CajaController::class, 'store']);
+Route::put('cajas/{id}', [CajaController::class, 'update']);
+Route::post('cajas/{id}', [CajaController::class, 'cerrarCaja']);
+Route::delete('cajas/{id}', [CajaController::class, 'delete']);
+
+//Credito
+Route::get('creditos', [CreditoController::class, 'index']);
+Route::get('creditos/{id}', [CreditoController::class, 'show']);
+Route::post('creditos', [CreditoController::class, 'store']);
+Route::put('creditos/{id}', [CreditoController::class, 'update']);
+Route::delete('creditos/{id}', [CreditoController::class, 'destroy']);
+
+//Servicio
+Route::get('servicios', [ServicioController::class, 'index']);
+Route::get('servicios/{id}', [ServicioController::class, 'show']);
+Route::post('servicios', [ServicioController::class, 'store']);
+Route::put('servicios/{id}', [ServicioController::class, 'update']);
+Route::delete('servicios/{id}', [ServicioController::class, 'destroy']);
+
+//Pagos
+Route::get('pagos', [PagoController::class, 'index']);
+Route::get('pagos/{id}', [PagoController::class, 'show']);
+Route::post('pagos', [PagoController::class, 'store']);
+Route::put('pagos/{id}', [PagoController::class, 'update']);
+Route::delete('pagos/{id}', [PagoController::class, 'destroy']);
+
+//PagoAlquiler
+Route::get('pagoalquileres', [PagoAlquilerController::class, 'index']);
+Route::get('pagoalquileres/{id}', [PagoAlquilerController::class, 'show']);
+Route::post('pagoalquileres', [PagoAlquilerController::class, 'store']);
+Route::put('pagoalquileres/{id}', [PagoAlquilerController::class, 'update']);
+Route::delete('pagoalquileres/{id}', [PagoAlquilerController::class, 'destroy']);
+
+//SaldoAlquiler
+Route::post('saldoalquileres', [SaldoAlquilerController::class, 'store']);

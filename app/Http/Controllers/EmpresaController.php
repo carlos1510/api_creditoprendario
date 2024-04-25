@@ -64,4 +64,12 @@ class EmpresaController extends Controller
 
         return response()->json($empresa, 201);
     }
+
+    public function update($id, Request $request) {
+        //
+    }
+
+    public function destroy($id) {
+        //
+    }
 }
