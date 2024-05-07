@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use Exception;
 
 class AuthController extends Controller
 {
@@ -15,7 +16,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        //$this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
     /**
@@ -118,9 +119,59 @@ class AuthController extends Controller
 
         $user->save();
 
-        return response()->json([
-            'message' => 'Usuario registrado exitosamente',
-            'user' => $user
-        ], 201);
+        return response()->json($user, 201);
+    }
+
+    public function index(Request $request) {
+        try{
+            $usuarios = User::all();
+
+            return response()->json(
+                [
+                    'data' => $usuarios,
+                    'status' => 200,
+                    'message' => 'Usuarios obtenidos correctamente'
+                ]
+            );
+        }catch(Exception $ex){
+            return response()->json(
+                [
+                    'data' => [],
+                    'status' => 401,
+                    'error' => 'Error al ejecutar la operación'
+                ]
+            );
+        }
+    }
+
+    public function update($id, Request $request) {
+        $user = User::find($id);
+        $validator = Validator::make($request->all(), [
+            'tipodocumentoid' => 'required',
+            'numerodocumento' => 'required',
+            'nombres' => 'required|string',
+            'apellidos' => 'required|string',
+            'username' => 'required|string|min:6',
+            'email' => 'required|string|email',
+            'acceso' => 'required',
+            'rol' => 'required',
+        ]);
+
+        if($validator->fails()){
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+        $user->tipodocumentoid = $request->tipodocumentoid;
+        $user->numerodocumento = $request->numerodocumento;
+        $user->nombres = $request->nombres;
+        $user->apellidos = $request->apellidos;
+        $user->username = $request->username;
+        $user->email = $request->email;
+        $user->acceso = $request->acceso;
+        $user->rol = $request->rol;
+
+        $user->update();
+
+        return response()->json($user, 201);
     }
 }

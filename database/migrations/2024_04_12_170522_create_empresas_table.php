@@ -15,6 +15,7 @@ class CreateEmpresasTable extends Migration
     {
         Schema::create('empresas', function (Blueprint $table) {
             $table->id();
+            $table->integer('tipodocumentoid');
             $table->string('nombre', 100);
             $table->string('numerodocumento', 15);
             $table->string('email', 100)->nullable();
@@ -22,8 +23,8 @@ class CreateEmpresasTable extends Migration
             $table->string('telefono', 15)->nullable();
             $table->string('rutaimagen')->nullable();
             $table->integer('gps')->nullable();
-            $table->string('tipomoneda', 15);
-            $table->string('simbolomoneda', 5);
+            $table->string('tipomoneda', 15)->nullable();
+            $table->string('simbolomoneda', 5)->nullable();
 
             $table->boolean('estado');
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Utils\Util;
 use App\Models\Caja;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -14,10 +15,21 @@ class CajaController extends Controller
         return response()->json($cajas, 200);
     }
 
-    public function show($id, Request $request){
-        $caja = Caja::find($id);
+    public function indexFilter($fecha_ini, $fecha_fin, Request $request){
+        $inicio = $fecha_ini!="null"?$fecha_ini:date("Y-m-01");
+        $fin = $fecha_fin!="null"?$fecha_fin:date("Y-m-t");
 
-        return response()->json($caja, 200);
+        $cajas = Caja::where('estado', 1)
+            ->whereBetween('fechaapertura', [$inicio, $fin])
+            ->get();
+
+        return response()->json(
+            [
+                'data' => $cajas,
+                'status' => 200,
+                'message' => 'Servicios obtenidos correctamente'
+            ]
+        );
     }
 
     public function store(Request $request) {
@@ -32,7 +44,7 @@ class CajaController extends Controller
         }
 
         $caja = new Caja();
-        $caja->fechaapertura = $request->fechaapertura;
+        $caja->fechaapertura = Util::convertirStringFecha($request->fechaapertura, false);
         $caja->horaapertura = $request->horaapertura;
         $caja->montoinicial = $request->montoinicial;
         $caja->fechacierre = null;
@@ -47,7 +59,11 @@ class CajaController extends Controller
 
         $caja->save();
 
-        return response()->json($caja, 200);
+        return response()->json([
+            'data' => $caja, 
+            'status' => 201,
+            'ok' => true
+        ]);
     }
 
     public function update($id, Request $request) {
@@ -63,19 +79,18 @@ class CajaController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        $caja->fechaapertura = $request->fechaapertura;
+        $caja->fechaapertura = Util::convertirStringFecha($request->fechaapertura, false);
         $caja->horaapertura = $request->horaapertura;
         $caja->montoinicial = $request->montoinicial;
-        $caja->fechacierre = isset($request->fechacierre)?$request->fechacierre:null;
-        $caja->horacierre = isset($request->horacierre)?$request->horacierre:null;
-        $caja->montocierre = isset($request->montocierre)?$request->montocierre:null;
-        $caja->montocredito = isset($request->montocredito)?$request->montocredito:null;
-        $caja->montogasto = isset($request->montogasto)?$request->montogasto:null;
-        $caja->montocobro = isset($request->montocobro)?$request->montocobro:null;
+        $caja->user_id = $request->user_id;
 
         $caja->update();
 
-        return response()->json($caja, 200);
+        return response()->json([
+            'data' => $caja, 
+            'status' => 201,
+            'ok' => true
+        ]);
     }
 
     public function cerrarCaja($id, Request $request) {
@@ -107,12 +122,16 @@ class CajaController extends Controller
         return response()->json($caja, 200);
     }
 
-    public function delete($id){
+    public function destroy($id){
         $caja = Caja::find($id);
         $caja->estado = 0; //estado eliminado
         
         $caja->update();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'data' => $caja, 
+            'status' => 201,
+            'ok' => true
+        ]);
     }
 }

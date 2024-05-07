@@ -9,7 +9,7 @@ class PagoAlquiler extends Model
 {
     use HasFactory;
 
-    //protected $table = 'pagoalquiler';
+    protected $table = 'pago_alquiler';
 
     //Relacion uno a muchos
 

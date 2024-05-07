@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCajaTable extends Migration
+class CreateCajasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateCajaTable extends Migration
      */
     public function up()
     {
-        Schema::create('caja', function (Blueprint $table) {
+        Schema::create('cajas', function (Blueprint $table) {
             $table->id();
             $table->date('fechaapertura');
             $table->string('horaapertura', 10);
@@ -49,6 +49,6 @@ class CreateCajaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('caja');
+        Schema::dropIfExists('cajas');
     }
 }

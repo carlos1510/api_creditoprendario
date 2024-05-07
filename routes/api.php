@@ -45,29 +45,29 @@ Route::get('clientes/{tipodocumento}&{numerodocumento}', [ClienteController::cla
 Route::get('empresas', [EmpresaController::class, 'index']);
 Route::get('empresas/{id}', [EmpresaController::class, 'show']);
 Route::post('empresas', [EmpresaController::class, 'store']);
-Route::put('empresas/{id}', [EmpresaController::class, 'update']);
+Route::patch('empresas/{id}', [EmpresaController::class, 'update']);
 Route::delete('empresas/{id}', [EmpresaController::class, 'destroy']);
 
 //Caja
 Route::get('cajas', [CajaController::class, 'index']);
-Route::get('cajas/{id}', [CajaController::class, 'show']);
+Route::get('cajas/{fecha1?}/{fecha2}', [CajaController::class, 'indexFilter']);
 Route::post('cajas', [CajaController::class, 'store']);
-Route::put('cajas/{id}', [CajaController::class, 'update']);
+Route::patch('cajas/{id}', [CajaController::class, 'update']);
 Route::post('cajas/{id}', [CajaController::class, 'cerrarCaja']);
-Route::delete('cajas/{id}', [CajaController::class, 'delete']);
+Route::delete('cajas/{id}', [CajaController::class, 'destroy']);
 
 //Credito
 Route::get('creditos', [CreditoController::class, 'index']);
 Route::get('creditos/{id}', [CreditoController::class, 'show']);
 Route::post('creditos', [CreditoController::class, 'store']);
-Route::put('creditos/{id}', [CreditoController::class, 'update']);
+Route::patch('creditos/{id}', [CreditoController::class, 'update']);
 Route::delete('creditos/{id}', [CreditoController::class, 'destroy']);
 
 //Servicio
 Route::get('servicios', [ServicioController::class, 'index']);
 Route::get('servicios/{id}', [ServicioController::class, 'show']);
 Route::post('servicios', [ServicioController::class, 'store']);
-Route::put('servicios/{id}', [ServicioController::class, 'update']);
+Route::patch('servicios/{id}', [ServicioController::class, 'update']);
 Route::delete('servicios/{id}', [ServicioController::class, 'destroy']);
 
 //Pagos
@@ -79,10 +79,17 @@ Route::delete('pagos/{id}', [PagoController::class, 'destroy']);
 
 //PagoAlquiler
 Route::get('pagoalquileres', [PagoAlquilerController::class, 'index']);
+Route::get('pagoalquileres/{fechaInicio?}/{fechaFinal?}', [PagoAlquilerController::class, 'indexFiltro']);
 Route::get('pagoalquileres/{id}', [PagoAlquilerController::class, 'show']);
 Route::post('pagoalquileres', [PagoAlquilerController::class, 'store']);
-Route::put('pagoalquileres/{id}', [PagoAlquilerController::class, 'update']);
+Route::patch('pagoalquileres/{id}', [PagoAlquilerController::class, 'update']);
 Route::delete('pagoalquileres/{id}', [PagoAlquilerController::class, 'destroy']);
 
 //SaldoAlquiler
 Route::post('saldoalquileres', [SaldoAlquilerController::class, 'store']);
+
+//Usuarios
+Route::get('usuarios', [AuthController::class, 'index']);
+Route::post('usuarios', [AuthController::class, 'register']);
+Route::patch('usuarios/{id}', [AuthController::class, 'update']);
+Route::delete('usuarios/{id}', [AuthController::class, 'destroy']);

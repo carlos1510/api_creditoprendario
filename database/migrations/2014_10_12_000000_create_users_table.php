@@ -20,11 +20,11 @@ class CreateUsersTable extends Migration
             $table->string('nombres', 100);
             $table->string('apellidos', 100);
             $table->string('username')->unique();
-            $table->string('email')->unique();
+            $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->integer('acceso');
-            $table->string('rol');
+            $table->string('rol')->nullable();
             $table->unsignedBigInteger('empresa_id')->nullable();
 
             $table->foreign("empresa_id")

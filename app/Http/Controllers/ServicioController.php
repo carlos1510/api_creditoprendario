@@ -3,21 +3,55 @@
 namespace App\Http\Controllers;
 
 use App\Models\Servicio;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ServicioController extends Controller
 {
     public function index(Request $request){
-        $servicios = Servicio::all()->where('estado', 1);
+        try{
+            $servicios = Servicio::where('estado', 1)->get();
 
-        return response()->json($servicios, 200);
+            return response()->json(
+                [
+                    'data' => $servicios,
+                    'status' => 200,
+                    'message' => 'Servicios obtenidos correctamente'
+                ]
+            );
+        }catch(Exception $ex){
+            return response()->json(
+                [
+                    'data' => [],
+                    'status' => 401,
+                    'error' => 'Error al ejecutar la operación'
+                ]
+            );
+        }
+        
     }
 
     public function show($id, Request $request){
-        $servicio = Servicio::find($id);
+        try{
+            $servicio = Servicio::find($id);
 
-        return response()->json($servicio, 200);
+            return response()->json(
+                [
+                    'data' => $servicio,
+                    'status' => 200,
+                    'message' => 'Servicios obtenidos correctamente'
+                ]
+            );
+        }catch(Exception $ex){
+            return response()->json(
+                [
+                    'data' => [],
+                    'status' => 401,
+                    'error' => 'Error al ejecutar la operación'
+                ]
+            );
+        }
     }
 
     public function store(Request $request){
@@ -71,7 +105,7 @@ class ServicioController extends Controller
         return response()->json($servicio, 201);
     }
 
-    public function delete($id) {
+    public function destroy($id) {
         $servicio = Servicio::find($id);
         $servicio->estado = 0;
 
