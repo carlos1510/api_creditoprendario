@@ -39,7 +39,7 @@ Route::group([
 });
 
 //Cliente
-Route::get('clientes/{tipodocumento}&{numerodocumento}', [ClienteController::class, 'getByTipoDocumento']);
+Route::get('clientes/{tipodocumento}/{numerodocumento}', [ClienteController::class, 'getByTipoDocumento']);
 
 //Empresa
 Route::get('empresas', [EmpresaController::class, 'index']);
@@ -57,8 +57,9 @@ Route::post('cajas/{id}', [CajaController::class, 'cerrarCaja']);
 Route::delete('cajas/{id}', [CajaController::class, 'destroy']);
 
 //Credito
-Route::get('creditos', [CreditoController::class, 'index']);
+Route::get('creditos/{responID?}/{fecha1?}/{fecha2?}/{nrodoc?}', [CreditoController::class, 'index']);
 Route::get('creditos/{id}', [CreditoController::class, 'show']);
+Route::get('creditos/comprobante/{id}', [CreditoController::class, 'getUltimoNroComprobante']);
 Route::post('creditos', [CreditoController::class, 'store']);
 Route::patch('creditos/{id}', [CreditoController::class, 'update']);
 Route::delete('creditos/{id}', [CreditoController::class, 'destroy']);

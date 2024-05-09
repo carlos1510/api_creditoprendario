@@ -2,17 +2,49 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Utils\Util;
 use App\Models\Cliente;
 use App\Models\Credito;
+use App\Models\TipoComprobante;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class CreditoController extends Controller
 {
-    public function index(Request $request) {
-        $creditos = Credito::all()->where('estado', 1);
+    public function index($responsableId, $fecha_ini, $fecha_fin, $nro_documento,Request $request) {
+        if($responsableId==0 && $fecha_ini=="null" && $fecha_fin=="null"){
+            $inicio = $fecha_ini!="null"?$fecha_ini:date("Y-m-01");
+            $fin = $fecha_fin!="null"?$fecha_fin:date("Y-m-t");
+            $creditos = Credito::select('creditos.id', 'creditos.fecha', 'creditos.fechalimite', 'creditos.seriecorrelativo', 'creditos.numerocorrelativo', 'creditos.codigogenerado', 'creditos.tipomoneda', 'creditos.descripcion_bien'
+            ,'creditos.igv', 'creditos.monto', 'creditos.interes', 'creditos.subtotal', 'creditos.total', 'creditos.total_texto', 'creditos.descuento', 'creditos.montoactual', 'creditos.estados', 'creditos.user_id', 'creditos.cliente_id',
+            'creditos.tipo_comprobante_id', 'creditos.servicio_id', 'b.tipodocumento', 'b.numerodocumento', 'b.nombrescliente', 'b.direccion', 'b.referencia', 'b.telefono1', 'b.telefono2'
+            , 'b.email')
+            ->join('clientes as b','creditos.cliente_id', '=','b.id')
+            ->where('creditos.estado', 1)
+            ->whereBetween('creditos.fecha', [$inicio, $fin])
+            ->get();
+        }else{
+            $sql = "SELECT a.id, a.fecha, a.fechalimite, a.seriecorrelativo, a.numerocorrelativo, a.codigogenerado, a.tipomoneda, a.descripcion_bien
+                ,a.igv, a.monto, a.interes, a.subtotal, a.total, a.total_texto, a.descuento, a.montoactual, a.estados, a.user_id, a.cliente_id,
+                a.tipo_comprobante_id, a.servicio_id, b.tipodocumento, b.numerodocumento, b.nombrescliente, b.direccion, b.referencia, b.telefono1, b.telefono2
+                , b.email 
+                FROM creditos a JOIN clientes b ON a.cliente_id=b.id 
+                WHERE a.estado=1 
+                ".(isset($fecha_ini)?($fecha_ini!="null"?(isset($fecha_fin)?($fecha_fin!="null"?" AND a.fecha BETWEEN '$fecha_ini' AND '$fecha_fin' ":""):""):""):"").
+                (isset($responsableId)?($responsableId!=0?" AND a.user_id=$responsableId ":""):"").
+                (isset($nro_documento)?($nro_documento!=0?" AND b.numerodocumento=''":""):"");
+            $creditos = DB::select($sql);
+        }
 
-        return response()->json($creditos, 200);
+        return response()->json(
+            [
+                'data' =>  $creditos,
+                'status' => 200,
+                'ok' => true
+            ]
+        );
     }
 
     public function show($id, Request $request) {
@@ -25,14 +57,11 @@ class CreditoController extends Controller
         $validator = Validator::make($request->all(), [
             'fecha' => 'required',
             'fechalimite' => 'required',
-            'seriecorrelativo' => 'required',
-            'numerocorrelativo' => 'required',
             'codigogenerado' => 'required',
             'tipomoneda' => 'required',
             'descripcion_bien' => 'required',
             'monto' => 'required',
             'interes' => 'required',
-            'subtotal' => 'required',
             'total' => 'required',
             'total_texto' => 'required',
             'tipodocumento' => 'required',
@@ -44,7 +73,7 @@ class CreditoController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        if(!$request->has('cliente_id')){
+        if(is_null($request->cliente_id)){
             $cliente = new Cliente();
             $cliente->tipodocumento = $request->tipodocumento;
             $cliente->numerodocumento = $request->numerodocumento;
@@ -77,7 +106,7 @@ class CreditoController extends Controller
 
         $credito = new Credito();
         $credito->fecha = $request->fecha;
-        $credito->fechalimite = $request->fechalimite;
+        $credito->fechalimite = Util::convertirStringFecha($request->fechalimite, false);
         $credito->seriecorrelativo = $request->seriecorrelativo;
         $credito->numerocorrelativo = $request->numerocorrelativo;
         $credito->codigogenerado = $request->codigogenerado;
@@ -190,5 +219,29 @@ class CreditoController extends Controller
         $credito->update();
 
         return response()->json(null, 201);
+    }
+
+    public function getUltimoNroComprobante($tipoComprobanteID, Request $request){
+        $nroComprobante = Credito::selectRaw("IF(ISNULL(MAX(numerocorrelativo)), 0, MAX(numerocorrelativo)) AS numero")
+            ->where('tipo_comprobante_id', $tipoComprobanteID)
+            ->first();
+
+        $nroSerie = Credito::selectRaw("IF(ISNULL(MAX(seriecorrelativo)), 0,MAX(seriecorrelativo)) as serie")
+        ->where('tipo_comprobante_id', $tipoComprobanteID)
+        ->first();
+
+        $tipoComprobante = TipoComprobante::find($tipoComprobanteID);
+
+        $codigoGenerado = $tipoComprobante->anotacion.sprintf("%02d",(int)$nroSerie->serie + 1)."-".sprintf("%04d", ($nroComprobante->numero + 1));
+        $seriecorrelativo = $nroSerie->serie + 1;
+        $numerocorrelativo = $nroComprobante->numero + 1;
+
+        return response()->json(
+            [
+                'data' => array('codigogenerado' => $codigoGenerado, 'seriecorrelativo' => $seriecorrelativo, 'numerocorrelativo' => $numerocorrelativo),
+                'status' => 200,
+                'ok' => true
+            ]
+        );
     }
 }

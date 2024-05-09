@@ -17,6 +17,7 @@ class CreateTipoComprobantesTable extends Migration
             $table->id();
             $table->string('nombre', 45);
             $table->string('nombreabreviado', 10)->nullable();
+            $table->string('anotacion', 3)->nullable();
             $table->timestamps();
         });
     }

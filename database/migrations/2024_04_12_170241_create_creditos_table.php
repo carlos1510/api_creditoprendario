@@ -17,15 +17,15 @@ class CreateCreditosTable extends Migration
             $table->id();
             $table->date('fecha');
             $table->date('fechalimite');
-            $table->integer('seriecorrelativo');
-            $table->integer('numerocorrelativo');
+            $table->integer('seriecorrelativo')->nullable();
+            $table->integer('numerocorrelativo')->nullable();
             $table->string('codigogenerado');
             $table->string('tipomoneda');
             $table->string('descripcion_bien');
             $table->double('igv')->nullable();
             $table->double('monto');
             $table->double('interes');
-            $table->double('subtotal');
+            $table->double('subtotal')->nullable();
             $table->double('total');
             $table->string('total_texto');
             $table->double('descuento')->nullable();
