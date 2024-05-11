@@ -22,8 +22,8 @@ class CreatePagoalquilerTable extends Migration
             $table->string('rutaimagen')->nullable();
             $table->boolean('estado');
 
-            $table->unsignedBigInteger('tipo_banco_id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('tipo_banco_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
 
             $table->foreign("tipo_banco_id")
                 ->references("id")
