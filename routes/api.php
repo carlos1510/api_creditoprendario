@@ -57,8 +57,8 @@ Route::post('cajas/{id}', [CajaController::class, 'cerrarCaja']);
 Route::delete('cajas/{id}', [CajaController::class, 'destroy']);
 
 //Credito
+Route::get('creditos/cliente/{nro_doc}', [CreditoController::class, 'show']);
 Route::get('creditos/{responID?}/{fecha1?}/{fecha2?}/{nrodoc?}', [CreditoController::class, 'index']);
-Route::get('creditos/{id}', [CreditoController::class, 'show']);
 Route::get('creditos/comprobante/{id}', [CreditoController::class, 'getUltimoNroComprobante']);
 Route::post('creditos', [CreditoController::class, 'store']);
 Route::patch('creditos/{id}', [CreditoController::class, 'update']);
@@ -75,7 +75,7 @@ Route::delete('servicios/{id}', [ServicioController::class, 'destroy']);
 Route::get('pagos', [PagoController::class, 'index']);
 Route::get('pagos/{id}', [PagoController::class, 'show']);
 Route::post('pagos', [PagoController::class, 'store']);
-Route::put('pagos/{id}', [PagoController::class, 'update']);
+Route::patch('pagos/{id}', [PagoController::class, 'update']);
 Route::delete('pagos/{id}', [PagoController::class, 'destroy']);
 
 //PagoAlquiler

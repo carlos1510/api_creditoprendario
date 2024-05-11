@@ -18,8 +18,10 @@ class CreatePagosTable extends Migration
             
             $table->date('fecha');
             $table->double('capital');
+            $table->double('interes');
+            $table->double('total');
             $table->double('monto');
-            $table->double('montorestante');
+            $table->double('montorestante')->nullable();
             $table->string('descripcion')->nullable();
             
             $table->boolean('estado');

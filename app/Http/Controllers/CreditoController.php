@@ -14,27 +14,33 @@ use Illuminate\Support\Facades\Validator;
 class CreditoController extends Controller
 {
     public function index($responsableId, $fecha_ini, $fecha_fin, $nro_documento,Request $request) {
-        if($responsableId==0 && $fecha_ini=="null" && $fecha_fin=="null"){
+        if($responsableId==0 && $fecha_ini=="null" && $fecha_fin=="null" && $nro_documento==0){
             $inicio = $fecha_ini!="null"?$fecha_ini:date("Y-m-01");
             $fin = $fecha_fin!="null"?$fecha_fin:date("Y-m-t");
             $creditos = Credito::select('creditos.id', 'creditos.fecha', 'creditos.fechalimite', 'creditos.seriecorrelativo', 'creditos.numerocorrelativo', 'creditos.codigogenerado', 'creditos.tipomoneda', 'creditos.descripcion_bien'
             ,'creditos.igv', 'creditos.monto', 'creditos.interes', 'creditos.subtotal', 'creditos.total', 'creditos.total_texto', 'creditos.descuento', 'creditos.montoactual', 'creditos.estados', 'creditos.user_id', 'creditos.cliente_id',
             'creditos.tipo_comprobante_id', 'creditos.servicio_id', 'b.tipodocumento', 'b.numerodocumento', 'b.nombrescliente', 'b.direccion', 'b.referencia', 'b.telefono1', 'b.telefono2'
-            , 'b.email')
+            , 'b.email', 'c.tiposervicio', 'd.nombre as nombre_comprobante')
             ->join('clientes as b','creditos.cliente_id', '=','b.id')
+            ->join('servicios as c','creditos.servicio_id', '=','c.id')
+            ->join('tipo_comprobantes as d','creditos.tipo_comprobante_id','=','d.id')
             ->where('creditos.estado', 1)
             ->whereBetween('creditos.fecha', [$inicio, $fin])
+            ->orderBy('creditos.fecha','desc')
             ->get();
         }else{
             $sql = "SELECT a.id, a.fecha, a.fechalimite, a.seriecorrelativo, a.numerocorrelativo, a.codigogenerado, a.tipomoneda, a.descripcion_bien
                 ,a.igv, a.monto, a.interes, a.subtotal, a.total, a.total_texto, a.descuento, a.montoactual, a.estados, a.user_id, a.cliente_id,
                 a.tipo_comprobante_id, a.servicio_id, b.tipodocumento, b.numerodocumento, b.nombrescliente, b.direccion, b.referencia, b.telefono1, b.telefono2
-                , b.email 
+                , b.email, c.tiposervicio, d.nombre as nombre_comprobante  
                 FROM creditos a JOIN clientes b ON a.cliente_id=b.id 
+                JOIN servicios c on a.servicio_id=c.id 
+                JOIN tipo_comprobantes d ON a.tipo_comprobante_id=d.id
                 WHERE a.estado=1 
                 ".(isset($fecha_ini)?($fecha_ini!="null"?(isset($fecha_fin)?($fecha_fin!="null"?" AND a.fecha BETWEEN '$fecha_ini' AND '$fecha_fin' ":""):""):""):"").
                 (isset($responsableId)?($responsableId!=0?" AND a.user_id=$responsableId ":""):"").
-                (isset($nro_documento)?($nro_documento!=0?" AND b.numerodocumento=''":""):"");
+                (isset($nro_documento)?($nro_documento!=0?" AND b.numerodocumento='$nro_documento'":""):"").
+                " ORDER BY a.fecha desc";
             $creditos = DB::select($sql);
         }
 
@@ -47,10 +53,34 @@ class CreditoController extends Controller
         );
     }
 
-    public function show($id, Request $request) {
-        $credito = Credito::find($id);
+    public function show($nro_documento, Request $request) {
+        if($nro_documento != ""){
+            $creditos = DB::select("SELECT t1.id, t1.fecha, t1.fechalimite, t1.total, t1.interes, t1.monto, t1.descripcion_bien, t1.numerodocumento, t1.nombrescliente, t1.codigogenerado, 
+                t1.interes_actual, IF(t1.interes_actual=0, 0, (t1.total + t1.t1.interes_actual)) AS total_actual
+                FROM 
+                (SELECT t.id, t.fecha, t.fechalimite, t.total, t.interes, t.monto, t.descripcion_bien, t.numerodocumento, t.nombrescliente, t.codigogenerado,
+                ROUND((((t.total*(t.porcentaje/100))/t.nro_perio_calculado)*t.nro_dias), 2) AS interes_actual 
+                FROM 
+                    (SELECT a.id, a.fecha, a.fechalimite, a.total, a.interes, a.monto, a.descripcion_bien, a.codigogenerado    
+                        ,b.numerodocumento, b.nombrescliente,
+                        IF(CURDATE()>a.fechalimite, DATEDIFF(CURDATE(),a.fechalimite), 0) AS nro_dias,
+                        IF(c.periodo='DIAS', c.numeroperiodo, IF(periodo='SEMANAS', c.numeroperiodo * 7, IF(c.periodo='MES', c.numeroperiodo * 30, 0))) AS nro_perio_calculado,
+                        c.porcentaje
+                        FROM creditos a 
+                        JOIN clientes b ON a.cliente_id=b.id 
+                        JOIN servicios c ON a.servicio_id=c.id 
+                        WHERE a.estado=1 and a.estados='ACTIVO' and b.numerodocumento='$nro_documento' 
+                    ) AS t
+                ) AS t1");
+        }
 
-        return response()->json($credito, 200);
+        return response()->json(
+            [
+                'data' =>  isset($creditos)?$creditos:[],
+                'status' => 200,
+                'ok' => true
+            ]
+        );
     }
 
     public function store(Request $request) {
@@ -128,7 +158,13 @@ class CreditoController extends Controller
         $credito->empresa_id = $request->empresa_id;
         $credito->save();
 
-        return response()->json($credito, 201);
+        return response()->json(
+            [
+                'data' =>  $credito,
+                'status' => 201,
+                'ok' => true
+            ]
+        );
     }
 
     public function update($id, Request $request){
@@ -137,14 +173,11 @@ class CreditoController extends Controller
         $validator = Validator::make($request->all(), [
             'fecha' => 'required',
             'fechalimite' => 'required',
-            'seriecorrelativo' => 'required',
-            'numerocorrelativo' => 'required',
             'codigogenerado' => 'required',
             'tipomoneda' => 'required',
             'descripcion_bien' => 'required',
             'monto' => 'required',
             'interes' => 'required',
-            'subtotal' => 'required',
             'total' => 'required',
             'total_texto' => 'required',
             'tipodocumento' => 'required',
@@ -156,7 +189,7 @@ class CreditoController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        if(!$request->has('cliente_id')){
+        if(is_null($request->cliente_id)){
             $cliente = new Cliente();
             $cliente->tipodocumento = $request->tipodocumento;
             $cliente->numerodocumento = $request->numerodocumento;
@@ -188,7 +221,7 @@ class CreditoController extends Controller
         }
 
         $credito->fecha = $request->fecha;
-        $credito->fechalimite = $request->fechalimite;
+        $credito->fechalimite = Util::convertirStringFecha($request->fechalimite, false);
         $credito->seriecorrelativo = $request->seriecorrelativo;
         $credito->numerocorrelativo = $request->numerocorrelativo;
         $credito->codigogenerado = $request->codigogenerado;
@@ -207,7 +240,13 @@ class CreditoController extends Controller
 
         $credito->update();
 
-        return response()->json($credito, 201);
+        return response()->json(
+            [
+                'data' =>  $credito,
+                'status' => 201,
+                'ok' => true
+            ]
+        );
     }
 
     public function destroy($id) {
@@ -218,7 +257,13 @@ class CreditoController extends Controller
 
         $credito->update();
 
-        return response()->json(null, 201);
+        return response()->json(
+            [
+                'data' =>  $credito,
+                'status' => 201,
+                'ok' => true
+            ]
+        );
     }
 
     public function getUltimoNroComprobante($tipoComprobanteID, Request $request){

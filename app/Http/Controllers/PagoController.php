@@ -25,7 +25,6 @@ class PagoController extends Controller
             'fecha' => 'required',
             'capital' => 'required',
             'monto' => 'required',
-            'montorestante' => 'required'
         ]);
 
         if($validator->fails()){
@@ -35,9 +34,11 @@ class PagoController extends Controller
         $pago = new Pago();
         $pago->fecha = $request->fecha;
         $pago->capital = $request->capital;
+        $pago->interes = $request->interes;
+        $pago->total = $request->total;
         $pago->monto = $request->monto;
-        $pago->montorestante = $request->montorestante;
-        $pago->descripcion = $request->descripcion;
+        $pago->montorestante = isset($request->montorestante)?$request->montorestante:null;
+        $pago->descripcion = isset($request->descripcion)?$request->descripcion:null;
         $pago->estado = 1;
         //$pago->user_id = $request->user()->id;
         $pago->user_id = $request->user_id;
@@ -45,7 +46,13 @@ class PagoController extends Controller
         $pago->credito_id = $request->credito_id;
         $pago->save();
 
-        return response()->json($pago, 201);
+        return response()->json(
+            [
+                'data' =>  $pago,
+                'status' => 201,
+                'ok' => true
+            ]
+        );
     }
 
     public function update($id, Request $request) {
@@ -55,7 +62,6 @@ class PagoController extends Controller
             'fecha' => 'required',
             'capital' => 'required',
             'monto' => 'required',
-            'montorestante' => 'required'
         ]);
 
         if($validator->fails()){
@@ -64,13 +70,21 @@ class PagoController extends Controller
 
         $pago->fecha = $request->fecha;
         $pago->capital = $request->capital;
+        $pago->interes = $request->interes;
+        $pago->total = $request->total;
         $pago->monto = $request->monto;
-        $pago->montorestante = $request->montorestante;
-        $pago->descripcion = $request->descripcion;
+        $pago->montorestante = isset($request->montorestante)?$request->montorestante:null;
+        $pago->descripcion = isset($request->descripcion)?$request->descripcion:null;
 
         $pago->update();
 
-        return response()->json($pago, 201);
+        return response()->json(
+            [
+                'data' =>  $pago,
+                'status' => 201,
+                'ok' => true
+            ]
+        );
     }
 
     public function destroy($id) {
@@ -78,6 +92,12 @@ class PagoController extends Controller
 
         $pago->estado = 1;
 
-        return response()->json($pago, 201);
+        return response()->json(
+            [
+                'data' =>  $pago,
+                'status' => 201,
+                'ok' => true
+            ]
+        );
     }
 }
