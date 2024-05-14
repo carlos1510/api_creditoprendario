@@ -50,16 +50,17 @@ Route::delete('empresas/{id}', [EmpresaController::class, 'destroy']);
 
 //Caja
 Route::get('cajas', [CajaController::class, 'index']);
+Route::get('cajas/{id}', [CajaController::class, 'getCerrarCaja']);
 Route::get('cajas/{fecha1?}/{fecha2}', [CajaController::class, 'indexFilter']);
 Route::post('cajas', [CajaController::class, 'store']);
 Route::patch('cajas/{id}', [CajaController::class, 'update']);
-Route::post('cajas/{id}', [CajaController::class, 'cerrarCaja']);
+Route::post('cajas/cierre', [CajaController::class, 'cerrarCaja']);
 Route::delete('cajas/{id}', [CajaController::class, 'destroy']);
 
 //Credito
 Route::get('creditos/cliente/{nro_doc}', [CreditoController::class, 'show']);
-Route::get('creditos/{responID?}/{fecha1?}/{fecha2?}/{nrodoc?}', [CreditoController::class, 'index']);
 Route::get('creditos/comprobante/{id}', [CreditoController::class, 'getUltimoNroComprobante']);
+Route::get('creditos/{responID?}/{fecha1?}/{fecha2?}/{nrodoc?}', [CreditoController::class, 'index']);
 Route::post('creditos', [CreditoController::class, 'store']);
 Route::patch('creditos/{id}', [CreditoController::class, 'update']);
 Route::delete('creditos/{id}', [CreditoController::class, 'destroy']);
@@ -91,6 +92,8 @@ Route::post('saldoalquileres', [SaldoAlquilerController::class, 'store']);
 
 //Usuarios
 Route::get('usuarios', [AuthController::class, 'index']);
+Route::get('usuarios/empresa', [AuthController::class, 'getUsersByEmpresa']);
+Route::get('usuarios/{tipodoc}/{nrodoc}', [AuthController::class, 'getDatosUsersByDoc']);
 Route::post('usuarios', [AuthController::class, 'register']);
 Route::patch('usuarios/{id}', [AuthController::class, 'update']);
 Route::delete('usuarios/{id}', [AuthController::class, 'destroy']);

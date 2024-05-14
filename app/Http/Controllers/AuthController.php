@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Exception;
+use GuzzleHttp\Client;
 
 class AuthController extends Controller
 {
@@ -174,4 +175,64 @@ class AuthController extends Controller
 
         return response()->json($user, 201);
     }
+
+    public function getUsersByEmpresa(Request $request) {
+        $usuarios = User::where('empresa_id',1)
+        ->where('acceso',1)
+        ->get();
+
+        return response()->json(
+            [
+                'data' => $usuarios,
+                'status' => 200,
+                'ok' => true
+            ]
+        );
+    }
+
+    public function getDatosUsersByDoc($tipodocumento, $numerodocumento) {
+        $data = array('tipodocumento' => $tipodocumento, 'numerodocumento' => $numerodocumento, 'nombres' => '', 'apellidos' => '');
+        try{
+            $user = User::where('tipodocumentoid', $tipodocumento)
+                ->where('numerodocumento', $numerodocumento)
+                ->first();
+
+            if(!isset($user->id)){
+                if($tipodocumento == 1){
+                    //DNI
+                    //consultaremos a la api de padron persona
+                    $token = 'apis-token-866.a7kD7Q9DNmGj1NG1uYFqp1PxnGB8zpjd';
+
+                    $client = new Client(['base_uri' => 'https://api.apis.net.pe', 'verify' => false]);
+                    $parameters = [
+                        'http_errors' => false,
+                        'connect_timeout' => 5,
+                        'headers' => [
+                            'Authorization' => 'Bearer '.$token,
+                            'Referer' => 'https://apis.net.pe/api-consulta-dni',
+                            'User-Agent' => 'laravel/guzzle',
+                            'Accept' => 'application/json',
+                        ],
+                        'query' => ['numero' => $numerodocumento]
+                    ];
+                    $res = $client->request('GET', '/v1/dni', $parameters);
+                    $resultado = json_decode($res->getBody()->getContents(), true);
+                    $data = array('tipodocumento' => $tipodocumento, 'numerodocumento' => $numerodocumento, 'nombres' => $resultado['nombres'], 'apellidos' => $resultado['apellidoPaterno'].' '.$resultado['apellidoMaterno']);
+                }
+            }
+
+            return response()->json([
+                'data' => isset($user->id)?$user:$data, 
+                'status' => 201,
+                'ok' => true
+            ]);
+        }catch(Exception $ex){
+            return response()->json([
+                'data' => $data, 
+                'status' => 201,
+                'ok' => true
+            ]);
+        }
+    }
+
 }

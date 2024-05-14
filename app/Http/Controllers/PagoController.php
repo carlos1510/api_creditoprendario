@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Credito;
 use App\Models\Pago;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -45,6 +46,14 @@ class PagoController extends Controller
         $pago->empresa_id = $request->empresa_id;
         $pago->credito_id = $request->credito_id;
         $pago->save();
+
+        if($pago->total == $pago->monto){
+            //se termino el pago
+            $credito = Credito::find($pago->credito_id);
+            $credito->estado = 2;
+            $credito->estados = 'PAGADO';
+            $credito->update();
+        }
 
         return response()->json(
             [

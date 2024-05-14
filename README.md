@@ -37,6 +37,9 @@
     DB_USERNAME=root
     DB_PASSWORD=
 
+    EJECUTAMOS EL SIGUIENTE COMANDO PARA CREAR EL KEY API
+    php artisan key:generate
+
     EJECUTAMOS LAS MIGRACIONES PARA LA CREACION DE LAS TABLAS
 
     php artisan migrate
