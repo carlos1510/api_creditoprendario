@@ -165,4 +165,18 @@ class CajaController extends Controller
             'ok' => true
         ]);
     }
+
+    public function getAperturaCaja(Request $request) {
+        $caja = Caja::selectRaw('DATEDIFF(CURDATE(),fechaapertura) as apertura_activo')
+        ->where('estado', 1)
+        ->where('user_id',1)
+        ->where('empresa_id',1)
+        ->first();
+
+        return response()->json([
+            'data' => is_null($caja)?array('apertura_activo'=>-1):$caja, 
+            'status' => 201,
+            'ok' => true
+        ]);
+    }
 }

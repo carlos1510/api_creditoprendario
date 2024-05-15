@@ -55,6 +55,7 @@ Route::get('cajas/{fecha1?}/{fecha2}', [CajaController::class, 'indexFilter']);
 Route::post('cajas', [CajaController::class, 'store']);
 Route::patch('cajas/{id}', [CajaController::class, 'update']);
 Route::post('cajas/cierre', [CajaController::class, 'cerrarCaja']);
+Route::post('cajas/obtenerapertura', [CajaController::class, 'getAperturaCaja']);
 Route::delete('cajas/{id}', [CajaController::class, 'destroy']);
 
 //Credito
