@@ -160,7 +160,7 @@ class CreditoController extends Controller
 
         return response()->json(
             [
-                'data' =>  $credito,
+                'data' =>  $this->prepararImprimirCredito($credito->id),
                 'status' => 201,
                 'ok' => true
             ]
@@ -288,5 +288,23 @@ class CreditoController extends Controller
                 'ok' => true
             ]
         );
+    }
+
+    protected function prepararImprimirCredito($id){
+        $pago = Credito::select('d.nombre AS nombre_empresa', 'd.direccion AS direccion_empresa', 'd.numerodocumento AS nrodoc_empresa',
+        'creditos.monto', 'creditos.interes', 'creditos.total', 'creditos.fechalimite', 'creditos.codigogenerado', 'b.nombre AS nom_tipo_comprobante',
+        'creditos.descripcion_bien', 'c.tiposervicio', 'e.nombres AS nombres_cajero', 'f.nombrescliente', 'f.numerodocumento AS nrodoc_cliente','creditos.fecha')
+        ->selectRaw("DATE_FORMAT(creditos.created_at, '%H:%i:%s') AS hora")
+        ->selectRaw("IF(creditos.tipo_comprobante_id=1,'DNI','RUC') AS descripcion_tipo_doc_empresa")
+        ->join('tipo_comprobantes AS b','creditos.tipo_comprobante_id','=','b.id')
+        ->join('servicios AS c','creditos.servicio_id','=','c.id')
+        ->join('empresas AS d', 'creditos.empresa_id','=','d.id')
+        ->join('users AS e','creditos.user_id','=','e.id')
+        ->join('clientes AS f','creditos.cliente_id','=','f.id')
+        ->where('creditos.estado',1)
+        ->where('creditos.id', $id)
+        ->first();
+
+        return $pago;
     }
 }

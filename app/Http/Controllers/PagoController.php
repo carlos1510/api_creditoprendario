@@ -47,17 +47,17 @@ class PagoController extends Controller
         $pago->credito_id = $request->credito_id;
         $pago->save();
 
-        if($pago->total == $pago->monto){
+        /*if($pago->total == $pago->monto){
             //se termino el pago
             $credito = Credito::find($pago->credito_id);
             $credito->estado = 2;
             $credito->estados = 'PAGADO';
             $credito->update();
-        }
+        }*/
 
         return response()->json(
             [
-                'data' =>  $pago,
+                'data' =>  $this->prepararImprimirPago($pago->id),
                 'status' => 201,
                 'ok' => true
             ]
@@ -108,5 +108,25 @@ class PagoController extends Controller
                 'ok' => true
             ]
         );
+    }
+
+    protected function prepararImprimirPago($id){
+        $pago = Pago::select('pagos.fecha','pagos.monto','pagos.interes','pagos.capital','pagos.total','a.fechalimite',
+        'a.codigogenerado','a.descripcion_bien','f.tiposervicio','b.nombre AS nombre_empresa','b.direccion AS direccion_empresa',
+        'e.nombre AS nom_tipo_comprobante',"c.nombres AS nombres_cajero",
+        'b.numerodocumento AS nrodoc_empresa', 'nombrescliente','d.numerodocumento AS nrodoc_cliente')
+        ->selectRaw("DATE_FORMAT(pagos.created_at, '%H:%i:%s') AS hora")
+        ->selectRaw(" IF(a.tipo_comprobante_id=1,'DNI','RUC') AS descripcion_tipo_doc_empresa")
+        ->join('creditos AS a','pagos.credito_id','=','a.id')
+        ->join('tipo_comprobantes AS e','a.tipo_comprobante_id','=','e.id')
+        ->join('servicios AS f', 'a.servicio_id','=','f.id')
+        ->join('empresas AS b','pagos.empresa_id','=','b.id')
+        ->join('users AS c','pagos.user_id','=','c.id')
+        ->join('clientes AS d','a.cliente_id','=','d.id')
+        ->where('pagos.estado',1)
+        ->where('pagos.id', $id)
+        ->first();
+
+        return $pago;
     }
 }

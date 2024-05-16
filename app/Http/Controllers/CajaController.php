@@ -27,6 +27,7 @@ class CajaController extends Controller
         ->join("users as b","cajas.user_id","=","b.id")
             ->whereIn('estado', [1,2])
             ->whereBetween('fechaapertura', [$inicio, $fin])
+            ->orderBy('cajas.created_at','desc')
             ->get();
 
         return response()->json(
