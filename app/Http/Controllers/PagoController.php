@@ -47,13 +47,13 @@ class PagoController extends Controller
         $pago->credito_id = $request->credito_id;
         $pago->save();
 
-        /*if($pago->total == $pago->monto){
+        if($pago->total == $pago->monto){
             //se termino el pago
             $credito = Credito::find($pago->credito_id);
             $credito->estado = 2;
             $credito->estados = 'PAGADO';
             $credito->update();
-        }*/
+        }
 
         return response()->json(
             [
