@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Exception;
-use Illuminate\Http\Request;
 
-use function PHPUnit\Framework\isNull;
 use GuzzleHttp\Client;
+date_default_timezone_set('America/Lima');
 
 class ClienteController extends Controller
 {

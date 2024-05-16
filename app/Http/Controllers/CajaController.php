@@ -7,6 +7,7 @@ use App\Models\Caja;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+date_default_timezone_set('America/Lima');
 
 class CajaController extends Controller
 {

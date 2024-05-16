@@ -6,6 +6,7 @@ use App\Models\Credito;
 use App\Models\Pago;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+date_default_timezone_set('America/Lima');
 
 class PagoController extends Controller
 {

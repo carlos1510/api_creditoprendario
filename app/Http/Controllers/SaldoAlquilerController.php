@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SaldoAlquiler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+date_default_timezone_set('America/Lima');
 
 class SaldoAlquilerController extends Controller
 {

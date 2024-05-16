@@ -7,6 +7,7 @@ use App\Models\PagoAlquiler;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+date_default_timezone_set('America/Lima');
 
 class PagoAlquilerController extends Controller
 {

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Exception;
 use GuzzleHttp\Client;
+date_default_timezone_set('America/Lima');
 
 class AuthController extends Controller
 {

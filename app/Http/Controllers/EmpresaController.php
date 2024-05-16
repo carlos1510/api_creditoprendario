@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Empresa;
 use Exception;
+date_default_timezone_set('America/Lima');
 
 class EmpresaController extends Controller
 {

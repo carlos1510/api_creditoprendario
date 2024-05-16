@@ -1,5 +1,6 @@
 <?php 
 namespace App\Http\Utils;
+date_default_timezone_set('America/Lima');
 
 class Util{
     public static function convertirStringFecha($stringfecha,$conHoras = false, $lenguaje_origen= "ES", $lenguaje_destino= "EN"  ){
