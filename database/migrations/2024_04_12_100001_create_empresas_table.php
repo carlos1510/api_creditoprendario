@@ -15,6 +15,7 @@ class CreateEmpresasTable extends Migration
     {
         Schema::create('empresas', function (Blueprint $table) {
             $table->id();
+            $table->string('nombrenegocio', 100);
             $table->integer('tipodocumentoid');
             $table->string('nombre', 100);
             $table->string('numerodocumento', 15);

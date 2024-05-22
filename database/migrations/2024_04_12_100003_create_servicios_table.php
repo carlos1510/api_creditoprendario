@@ -19,6 +19,8 @@ class CreateServiciosTable extends Migration
             $table->string("descripcion")->nullable();
             $table->string("periodo", 25);
             $table->integer("numeroperiodo");
+            $table->double("porcentajesocio");
+            $table->double("porcentajenegocio");
             $table->double("porcentaje");
             $table->boolean("estado");
             $table->unsignedBigInteger("empresa_id")->nullable();

@@ -19,18 +19,22 @@ class CreateCreditosTable extends Migration
             $table->date('fechalimite');
             $table->integer('seriecorrelativo')->nullable();
             $table->integer('numerocorrelativo')->nullable();
-            $table->string('codigogenerado');
-            $table->string('tipomoneda');
+            $table->string('codigogenerado',25)->nullable();
+            $table->integer('numerocredito')->nullable();
+            $table->string('codigocredito', 25)->nullable();
+            $table->integer('numerocontrato')->nullable();
+            $table->string('codigocontrato', 25)->nullable();
+            $table->string('tipomoneda', 25);
             $table->string('descripcion_bien');
             $table->double('igv')->nullable();
             $table->double('monto');
-            $table->double('interes');
+            $table->double('interes')->nullable();
             $table->double('subtotal')->nullable();
-            $table->double('total');
+            $table->double('total')->nullable();
             $table->string('total_texto');
             $table->double('descuento')->nullable();
             $table->double('montoactual')->nullable();
-            $table->string('estados');
+            $table->string('estados', 25);
             $table->boolean('estado');
 
             $table->unsignedBigInteger('user_id')->nullable();

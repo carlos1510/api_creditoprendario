@@ -24,6 +24,9 @@ class CreateCajasTable extends Migration
             $table->double('montocredito')->nullable();
             $table->double('montogasto')->nullable();
             $table->double('montocierre')->nullable();
+            $table->double('totalcapital')->nullable();
+            $table->double('interessocio')->nullable();
+            $table->double('interesnegocio')->nullable();
             $table->integer('estado');
 
             $table->unsignedBigInteger('user_id')->nullable();

@@ -72,6 +72,8 @@ class ServicioController extends Controller
         $servicio->descripcion = isset($request->descripcion)?$request->descripcion:null;
         $servicio->periodo = $request->periodo;
         $servicio->numeroperiodo = $request->numeroperiodo;
+        $servicio->porcentajesocio = $request->porcentajesocio;
+        $servicio->porcentajenegocio = $request->porcentajenegocio;
         $servicio->porcentaje = $request->porcentaje;
         $servicio->estado = 1;
         $servicio->empresa_id = $request->empresa_id;
@@ -99,6 +101,8 @@ class ServicioController extends Controller
         $servicio->descripcion = isset($request->descripcion)?$request->descripcion:null;
         $servicio->periodo = $request->periodo;
         $servicio->numeroperiodo = $request->numeroperiodo;
+        $servicio->porcentajesocio = $request->porcentajesocio;
+        $servicio->porcentajenegocio = $request->porcentajenegocio;
         $servicio->porcentaje = $request->porcentaje;
 
         $servicio->update();

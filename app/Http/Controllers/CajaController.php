@@ -24,7 +24,7 @@ class CajaController extends Controller
         $cajas = Caja::select("cajas.id", "cajas.fechaapertura", "cajas.horaapertura","cajas.montoinicial",
         "cajas.fechacierre", "cajas.horacierre","cajas.montocobro","cajas.montocredito","cajas.montogasto",
         "cajas.montocierre","cajas.estado", "cajas.user_id", "cajas.empresa_id", "b.numerodocumento",
-        "b.nombres", "b.apellidos")
+        "b.nombres", "b.apellidos", "cajas.interessocio")
         ->join("users as b","cajas.user_id","=","b.id")
             ->whereIn('estado', [1,2])
             ->whereBetween('fechaapertura', [$inicio, $fin])
@@ -61,6 +61,9 @@ class CajaController extends Controller
         $caja->montocredito = null;
         $caja->montogasto = null;
         $caja->montocobro = null;
+        $caja->totalcapital = null;
+        $caja->interessocio = null;
+        $caja->interesnegocio = null;
         $caja->estado = 1;
         $caja->user_id = $request->user_id;
         $caja->empresa_id = $request->empresa_id;
@@ -110,6 +113,9 @@ class CajaController extends Controller
         $caja->montocredito = $request->montocredito;
         $caja->montogasto = isset($request->montogasto)?$request->montogasto:0;
         $caja->montocobro = $request->montocobro;
+        $caja->totalcapital = $request->totalcapital;
+        $caja->interessocio = $request->interessocio;
+        $caja->interesnegocio = $request->interesnegocio;
 
         $caja->estado = 2; //caja cerrado
 
@@ -127,8 +133,11 @@ class CajaController extends Controller
 
         $fecha_actual = date('Y-m-d');
 
-        $sql_pago = "SELECT IFNULL(SUM(a.monto),0) AS totalpagos 
-            FROM pagos a JOIN creditos b ON a.credito_id=b.cliente_id 
+        $sql_pago = "SELECT IFNULL(SUM(a.monto),0) AS totalpagos, 
+            ROUND((IFNULL(SUM(a.monto),0) - IFNULL(SUM(a.totalinteressocio), 0)), 2) AS totalcapital,
+            ROUND(IFNULL(SUM(a.totalinteressocio), 0), 2) as interessocio, 
+            ROUND(IFNULL(SUM(a.interes_negocio), 0), 2) AS interesnegocio 
+            FROM pagos a JOIN creditos b ON a.credito_id=b.id  
             WHERE a.estado=1 AND (a.fecha between '$caja->fechaapertura' AND '$fecha_actual')
             AND a.empresa_id='$caja->empresa_id' AND a.user_id=$caja->user_id";
         $result_pago = DB::selectOne($sql_pago);
@@ -147,6 +156,9 @@ class CajaController extends Controller
         $caja->montocredito = $result_credito->total_prestamo;
         $caja->montogasto = 0;
         $caja->montocobro = $result_pago->totalpagos;
+        $caja->totalcapital = $result_pago->totalcapital;
+        $caja->interessocio = $result_pago->interessocio;
+        $caja->interesnegocio = $result_pago->interesnegocio;
 
         return response()->json([
             'data' => $caja, 

@@ -52,8 +52,9 @@ class EmpresaController extends Controller
         }
 
         $empresa = new Empresa();
+        $empresa->nombrenegocio = strtoupper($request->nombrenegocio);
         $empresa->tipodocumentoid = $request->tipodocumentoid;
-        $empresa->nombre = $request->nombre;
+        $empresa->nombre = strtoupper($request->nombre);
         $empresa->numerodocumento = $request->numerodocumento;
         $empresa->email = isset($request->email)?$request->email:null;
         $empresa->direccion = isset($request->direccion)?$request->direccion:null;
@@ -101,8 +102,9 @@ class EmpresaController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
+        $empresa->nombrenegocio = strtoupper($request->nombrenegocio);
         $empresa->tipodocumentoid = $request->tipodocumentoid;
-        $empresa->nombre = $request->nombre;
+        $empresa->nombre = strtoupper($request->nombre);
         $empresa->numerodocumento = $request->numerodocumento;
         $empresa->email = $request->email;
         $empresa->direccion = $request->direccion;

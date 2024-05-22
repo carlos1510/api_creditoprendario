@@ -65,6 +65,8 @@ Route::get('creditos/{responID?}/{fecha1?}/{fecha2?}/{nrodoc?}', [CreditoControl
 Route::post('creditos', [CreditoController::class, 'store']);
 Route::patch('creditos/{id}', [CreditoController::class, 'update']);
 Route::delete('creditos/{id}', [CreditoController::class, 'destroy']);
+Route::get('imprimirTicketCredito/{id}', [CreditoController::class, 'prepararImprimirCredito']);
+Route::get('obtenerNroContratoCredito', [CreditoController::class, 'getUltimoNroCreditoContrato']);
 
 //Servicio
 Route::get('servicios', [ServicioController::class, 'index']);
@@ -76,9 +78,12 @@ Route::delete('servicios/{id}', [ServicioController::class, 'destroy']);
 //Pagos
 Route::get('pagos', [PagoController::class, 'index']);
 Route::get('pagos/{id}', [PagoController::class, 'show']);
+Route::get('pagos/comprobante/{id}', [PagoController::class, 'getUltimoNroComprobante']);
 Route::post('pagos', [PagoController::class, 'store']);
 Route::patch('pagos/{id}', [PagoController::class, 'update']);
 Route::delete('pagos/{id}', [PagoController::class, 'destroy']);
+Route::get('imprimirTicketPagos/{id}', [PagoController::class, 'prepararImprimirPago']);
+Route::get('obtenerNroPago', [PagoController::class, 'getUltimoNroPago']);
 
 //PagoAlquiler
 Route::get('pagoalquileres', [PagoAlquilerController::class, 'index']);

@@ -31,8 +31,15 @@ class TipoComprobanteSeeder extends Seeder
         $tipoComprobante3 = new TipoComprobante();
         $tipoComprobante3->nombre = 'NOTA DE VENTA';
         $tipoComprobante3->nombreabreviado = 'NDV';
-        $tipoComprobante2->anotacion = 'NV';
+        $tipoComprobante3->anotacion = 'NV';
 
         $tipoComprobante3->save();
+
+        $tipoComprobante4 = new TipoComprobante();
+        $tipoComprobante4->nombre = 'NOTA DE PAGO';
+        $tipoComprobante4->nombreabreviado = 'NDP';
+        $tipoComprobante4->anotacion = 'NP';
+
+        $tipoComprobante4->save();
     }
 }
