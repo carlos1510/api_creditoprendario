@@ -4,12 +4,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CreditoController;
+use App\Http\Controllers\DetalleCreditoController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\PagoAlquilerController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\SaldoAlquilerController;
 use App\Http\Controllers\ServicioController;
-use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -103,3 +103,6 @@ Route::get('usuarios/{tipodoc}/{nrodoc}', [AuthController::class, 'getDatosUsers
 Route::post('usuarios', [AuthController::class, 'register']);
 Route::patch('usuarios/{id}', [AuthController::class, 'update']);
 Route::delete('usuarios/{id}', [AuthController::class, 'destroy']);
+
+//DetalleCreditos
+Route::get('detallecreditos/creditos/{idcredito}', [DetalleCreditoController::class, 'obtenerDetalleByIdCredito']);

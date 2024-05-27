@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Utils\Util;
 use App\Models\Cliente;
 use App\Models\Credito;
+use App\Models\DetalleCredito;
 use App\Models\TipoComprobante;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -101,7 +102,6 @@ class CreditoController extends Controller
             'fechalimite' => 'required',
             'codigogenerado' => 'required',
             'tipomoneda' => 'required',
-            'descripcion_bien' => 'required',
             'monto' => 'required',
             'total_texto' => 'required',
             'tipodocumento' => 'required',
@@ -157,7 +157,7 @@ class CreditoController extends Controller
         $credito->numerocontrato = $request->numerocontrato;
         $credito->codigocontrato = $request->codigocontrato;
         $credito->tipomoneda = $request->tipomoneda;
-        $credito->descripcion_bien = $request->descripcion_bien;
+        $credito->descripcion_bien = isset($request->descripcion_bien)?$request->descripcion_bien:null;
         $credito->igv = $request->igv;
         $credito->monto = $request->monto;
         $credito->interes = $request->interes;
@@ -173,6 +173,23 @@ class CreditoController extends Controller
         $credito->servicio_id = $request->servicio_id;
         $credito->empresa_id = $request->empresa_id;
         $credito->save();
+
+        foreach($request->detalle as $item){
+            $item = (object)$item;
+
+            $detalle = new DetalleCredito();
+            $detalle->descripcion = $item->descripcion;
+            $detalle->valor1 = $item->valor1;
+            $detalle->valor2 = $item->valor2;
+            $detalle->valor3 = $item->valor3;
+            $detalle->observaciones = $item->observaciones;
+            $detalle->valorizacion = $item->valorizacion;
+            $detalle->estado = 1;
+            $detalle->credito_id = $credito->id;
+            $detalle->servicio_id = $request->servicio_id;
+
+            $detalle->save();
+        }
 
         return response()->json(
             [
@@ -191,7 +208,6 @@ class CreditoController extends Controller
             'fechalimite' => 'required',
             'codigogenerado' => 'required',
             'tipomoneda' => 'required',
-            'descripcion_bien' => 'required',
             'monto' => 'required',
             'total_texto' => 'required',
             'tipodocumento' => 'required',
@@ -246,7 +262,7 @@ class CreditoController extends Controller
         $credito->numerocontrato = $request->numerocontrato;
         $credito->codigocontrato = $request->codigocontrato;
         $credito->tipomoneda = $request->tipomoneda;
-        $credito->descripcion_bien = $request->descripcion_bien;
+        $credito->descripcion_bien = isset($request->descripcion_bien)?$request->descripcion_bien:null;
         $credito->igv = $request->igv;
         $credito->monto = $request->monto;
         $credito->interes = $request->interes;
@@ -259,6 +275,30 @@ class CreditoController extends Controller
         $credito->servicio_id = $request->servicio_id;
 
         $credito->update();
+
+        foreach($request->detalle as $resgistro){
+            if($resgistro->id != 0){
+                $detalle = DetalleCredito::find($resgistro->id);
+                $detalle->descripcion = $resgistro->descripcion;
+                $detalle->valor1 = $resgistro->valor1;
+                $detalle->valor2 = $resgistro->valor2;
+                $detalle->valor3 = $resgistro->valor3;
+                $detalle->observaciones = $resgistro->observaciones;
+                $detalle->valorizacion = $resgistro->valorizacion;
+                $detalle->servicio_id = $request->servicio_id;
+            }else{
+                $detalle = new DetalleCredito();
+                $detalle->descripcion = $resgistro->descripcion;
+                $detalle->valor1 = $resgistro->valor1;
+                $detalle->valor2 = $resgistro->valor2;
+                $detalle->valor3 = $resgistro->valor3;
+                $detalle->observaciones = $resgistro->observaciones;
+                $detalle->valorizacion = $resgistro->valorizacion;
+                $detalle->estado = 1;
+                $detalle->credito_id = $credito->id;
+                $detalle->servicio_id = $request->servicio_id;
+            }
+        }
 
         return response()->json(
             [

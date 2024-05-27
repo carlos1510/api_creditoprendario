@@ -25,7 +25,7 @@ class CreateCreditosTable extends Migration
             $table->integer('numerocontrato')->nullable();
             $table->string('codigocontrato', 25)->nullable();
             $table->string('tipomoneda', 25);
-            $table->string('descripcion_bien');
+            $table->string('descripcion_bien')->nullable();;
             $table->double('igv')->nullable();
             $table->double('monto');
             $table->double('interes')->nullable();
