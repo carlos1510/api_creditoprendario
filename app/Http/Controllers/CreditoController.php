@@ -375,11 +375,16 @@ class CreditoController extends Controller
 
     public function prepararImprimirCredito($id){
         $pago = Credito::select('d.nombre AS nombre_empresa', 'd.direccion AS direccion_empresa', 'd.numerodocumento AS nrodoc_empresa', 'creditos.codigocredito',
-        'creditos.monto', 'creditos.interes', 'creditos.total', 'creditos.fechalimite', 'creditos.codigogenerado', 'b.nombre AS nom_tipo_comprobante', 'd.nombrenegocio',
-        'creditos.descripcion_bien', 'c.tiposervicio', 'e.nombres AS nombres_cajero', 'f.nombrescliente', 'f.numerodocumento AS nrodoc_cliente','creditos.fecha')
+        'creditos.monto', 'creditos.fechalimite', 'creditos.codigogenerado', 'b.nombre AS nom_tipo_comprobante', 'd.nombrenegocio', 'creditos.codigocontrato','creditos.servicio_id',
+        'c.tiposervicio', 'e.nombres AS nombres_cajero', 'f.nombrescliente', 'f.numerodocumento AS nrodoc_cliente','f.direccion AS direccioncliente','creditos.fecha')
         ->selectRaw("DATE_FORMAT(creditos.created_at, '%H:%i:%s') AS hora")
         ->selectRaw("IF(creditos.tipo_comprobante_id=1,'DNI','RUC') AS descripcion_tipo_doc_empresa")
         ->selectRaw("CONCAT(IF(c.periodo='MES', (30*c.numeroperiodo), 0), ' Dias') AS plazo")
+        ->selectRaw("IF(c.periodo='MES', 'Mensual', '') AS formapago")
+        ->selectRaw("ROUND((creditos.monto*c.porcentajenegocio)/100,2) AS interesnegocio")
+        ->selectRaw("ROUND((creditos.monto*c.porcentajesocio)/100,2) AS interessocio")
+        ->selectRaw("ROUND((creditos.monto*0.10),2) AS pagominimo")
+        ->selectRaw("DATE_FORMAT(NOW(), '%d/%m/%Y %h:%i') AS fechahoraactual")
         ->join('tipo_comprobantes AS b','creditos.tipo_comprobante_id','=','b.id')
         ->join('servicios AS c','creditos.servicio_id','=','c.id')
         ->join('empresas AS d', 'creditos.empresa_id','=','d.id')
@@ -389,6 +394,10 @@ class CreditoController extends Controller
         ->where('creditos.id', $id)
         ->first();
 
-        return $pago;
+        $detalles = DetalleCredito::where('estado',1)
+        ->where('credito_id',$id)
+        ->get();
+
+        return ['pago'=>$pago, 'detalles'=>$detalles];
     }
 }
