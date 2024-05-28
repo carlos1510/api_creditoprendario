@@ -277,7 +277,8 @@ class CreditoController extends Controller
         $credito->update();
 
         foreach($request->detalle as $resgistro){
-            if($resgistro->id != 0){
+            $resgistro = (object)$resgistro;
+            if(isset($resgistro->id)){
                 $detalle = DetalleCredito::find($resgistro->id);
                 $detalle->descripcion = $resgistro->descripcion;
                 $detalle->valor1 = $resgistro->valor1;
@@ -285,7 +286,8 @@ class CreditoController extends Controller
                 $detalle->valor3 = $resgistro->valor3;
                 $detalle->observaciones = $resgistro->observaciones;
                 $detalle->valorizacion = $resgistro->valorizacion;
-                $detalle->servicio_id = $request->servicio_id;
+
+                $detalle->update();
             }else{
                 $detalle = new DetalleCredito();
                 $detalle->descripcion = $resgistro->descripcion;
@@ -297,6 +299,8 @@ class CreditoController extends Controller
                 $detalle->estado = 1;
                 $detalle->credito_id = $credito->id;
                 $detalle->servicio_id = $request->servicio_id;
+
+                $detalle->save();
             }
         }
 
