@@ -11,32 +11,29 @@ date_default_timezone_set('America/Lima');
 class EmpresaController extends Controller
 {
     public function index(Request $request) {
-        try{
-            $empresas = Empresa::where('estado', 1)->get();
+        $empresas = Empresa::where('estado', 1)->get();
 
-            return response()->json(
-                [
-                    'data' => $empresas,
-                    'status' => 200,
-                    'ok' => true,
-                    'message' => 'Empresas obtenidos correctamente'
-                ]
-            );
-        }catch(Exception $ex){
-            return response()->json(
-                [
-                    'data' => [],
-                    'status' => 401,
-                    'error' => 'Error al ejecutar la operación'
-                ]
-            );
-        }
+        return response()->json(
+            [
+                'data' => $empresas,
+                'status' => 200,
+                'ok' => true,
+                'message' => 'Empresas obtenidos correctamente'
+            ]
+        );
     }
 
     public function show($id, Request $request) {
         $empresa = Empresa::find($id);
 
-        return response()->json($empresa, 200);
+        return response()->json(
+            [
+                'data' => $empresa,
+                'status' => 200,
+                'ok' => true,
+                'message' => 'Empresas obtenidos correctamente'
+            ]
+        );
     }
 
     public function store(Request $request) {
@@ -86,7 +83,7 @@ class EmpresaController extends Controller
             'data' => $empresa, 
             'status' => 201,
             'ok' => true
-        ]);
+        ],201);
     }
 
     public function update($id, Request $request) {
@@ -131,7 +128,7 @@ class EmpresaController extends Controller
             'data' => $empresa, 
             'status' => 201,
             'ok' => true
-        ]);
+        ],201);
     }
 
     public function destroy($id) {
@@ -144,6 +141,6 @@ class EmpresaController extends Controller
             'data' => $empresa, 
             'status' => 201,
             'ok' => true
-        ]);
+        ],201);
     }
 }

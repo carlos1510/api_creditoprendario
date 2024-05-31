@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Exception;
 use GuzzleHttp\Client;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 date_default_timezone_set('America/Lima');
 
 class AuthController extends Controller
@@ -18,7 +22,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        //$this->middleware('auth:api', ['except' => ['login', 'register']]);
+        //$this->middleware('auth:api', ['except' => ['login']]);
     }
 
     /**
@@ -26,13 +30,22 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login()
+    public function login(LoginRequest $request)
     {
-        $credentials = request(['username', 'password']);
+        //$credentials = request(['username', 'password']);
+        $credentials = $request->only('username', 'password');
 
-        if (! $token = auth()->attempt($credentials)) {
+        try{
+            if (! $token = JWTAuth::attempt($credentials)) {
+                return response()->json(['error' => 'invalid credentials'], 401);
+            }
+    
+            //return $this->respondWithToken($token);
+        }catch(JWTException $ex){
             return response()->json(['error' => 'Unauthorized'], 401);
         }
+
+        //return response()->json($token);
 
         return $this->respondWithToken($token);
     }
@@ -55,7 +68,10 @@ class AuthController extends Controller
     public function logout()
     {        
         auth()->logout();
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json([
+            'ok' => true,
+            'status' => 200,
+        ], 200);
     }
 
     /**
@@ -78,10 +94,10 @@ class AuthController extends Controller
     protected function respondWithToken($token)
     {
         return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 120
-        ]);
+            'ok' => true,
+            'status' => 200,
+            'data' => array('token' => $token, 'token_type' => 'bearer', 'expires_in' => config('jwt.ttl'), 'user' => auth()->user())
+        ],200);
     }
 
     public function register(Request $request){
@@ -125,6 +141,7 @@ class AuthController extends Controller
     }
 
     public function index(Request $request) {
+        
         try{
             $usuarios = User::all();
 
@@ -133,15 +150,15 @@ class AuthController extends Controller
                     'data' => $usuarios,
                     'status' => 200,
                     'message' => 'Usuarios obtenidos correctamente'
-                ]
+                ],200
             );
-        }catch(Exception $ex){
+        }catch(JWTException $ex){
             return response()->json(
                 [
                     'data' => [],
                     'status' => 401,
                     'error' => 'Error al ejecutar la operación'
-                ]
+                ], 401
             );
         }
     }

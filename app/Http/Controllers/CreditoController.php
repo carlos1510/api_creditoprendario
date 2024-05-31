@@ -92,7 +92,7 @@ class CreditoController extends Controller
                 'data' =>  isset($creditos)?$creditos:[],
                 'status' => 200,
                 'ok' => true
-            ]
+            ], 200
         );
     }
 
@@ -196,7 +196,7 @@ class CreditoController extends Controller
                 'data' =>  $this->prepararImprimirCredito($credito->id),
                 'status' => 201,
                 'ok' => true
-            ]
+            ],201
         );
     }
 
@@ -309,7 +309,7 @@ class CreditoController extends Controller
                 'data' =>  $credito,
                 'status' => 201,
                 'ok' => true
-            ]
+            ],201
         );
     }
 
@@ -326,7 +326,7 @@ class CreditoController extends Controller
                 'data' =>  $credito,
                 'status' => 201,
                 'ok' => true
-            ]
+            ], 201
         );
     }
 
@@ -350,7 +350,7 @@ class CreditoController extends Controller
                 'data' => array('codigogenerado' => $codigoGenerado, 'seriecorrelativo' => $seriecorrelativo, 'numerocorrelativo' => $numerocorrelativo),
                 'status' => 200,
                 'ok' => true
-            ]
+            ], 200
         );
     }
 
@@ -373,7 +373,7 @@ class CreditoController extends Controller
                 'data' => array('numerocredito' => $numerocredito, 'codigocredito' => $codigocredito, 'numerocontrato' => $numerocontrato, 'codigocontrato' => $codigocontrato),
                 'status' => 200,
                 'ok' => true
-            ]
+            ], 200
         );
     }
 

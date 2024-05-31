@@ -11,48 +11,29 @@ date_default_timezone_set('America/Lima');
 class ServicioController extends Controller
 {
     public function index(Request $request){
-        try{
-            $servicios = Servicio::where('estado', 1)->get();
+        $servicios = Servicio::where('estado', 1)->get();
 
-            return response()->json(
-                [
-                    'data' => $servicios,
-                    'status' => 200,
-                    'message' => 'Servicios obtenidos correctamente'
-                ]
-            );
-        }catch(Exception $ex){
-            return response()->json(
-                [
-                    'data' => [],
-                    'status' => 401,
-                    'error' => 'Error al ejecutar la operación'
-                ]
-            );
-        }
-        
+        return response()->json(
+            [
+                'data' => $servicios,
+                'ok' => true,
+                'status' => 200,
+                'message' => 'Servicios obtenidos correctamente'
+            ]
+        );
     }
 
     public function show($id, Request $request){
-        try{
-            $servicio = Servicio::find($id);
+        $servicio = Servicio::find($id);
 
-            return response()->json(
-                [
-                    'data' => $servicio,
-                    'status' => 200,
-                    'message' => 'Servicios obtenidos correctamente'
-                ]
-            );
-        }catch(Exception $ex){
-            return response()->json(
-                [
-                    'data' => [],
-                    'status' => 401,
-                    'error' => 'Error al ejecutar la operación'
-                ]
-            );
-        }
+        return response()->json(
+            [
+                'data' => $servicio,
+                'status' => 200,
+                'ok' => true,
+                'message' => 'Servicios obtenidos correctamente'
+            ]
+        );
     }
 
     public function store(Request $request){
@@ -80,7 +61,14 @@ class ServicioController extends Controller
 
         $servicio->save();
 
-        return response()->json($servicio, 201);
+        return response()->json(
+            [
+                'data' => $servicio,
+                'status' => 201,
+                'ok' => true,
+                'message' => 'Servicios obtenidos correctamente'
+            ],201
+        );
     }
 
     public function update($id, Request $request){
@@ -107,7 +95,14 @@ class ServicioController extends Controller
 
         $servicio->update();
 
-        return response()->json($servicio, 201);
+        return response()->json(
+            [
+                'data' => $servicio,
+                'status' => 201,
+                'ok' => true,
+                'message' => 'Servicios obtenidos correctamente'
+            ],201
+        );
     }
 
     public function destroy($id) {
@@ -116,6 +111,13 @@ class ServicioController extends Controller
 
         $servicio->update();
 
-        return response()->json($servicio, 201);
+        return response()->json(
+            [
+                'data' => $servicio,
+                'status' => 201,
+                'ok' => true,
+                'message' => 'Servicios obtenidos correctamente'
+            ],201
+        );
     }
 }

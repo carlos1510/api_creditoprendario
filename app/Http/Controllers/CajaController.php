@@ -14,7 +14,11 @@ class CajaController extends Controller
     public function index(Request $request) {
         $cajas = Caja::all()->where('estado', 1);
 
-        return response()->json($cajas, 200);
+        return response()->json([
+            'data' => $cajas, 
+            'status' => 200,
+            'ok' => true
+        ],200);
     }
 
     public function indexFilter($fecha_ini, $fecha_fin, Request $request){
@@ -35,8 +39,9 @@ class CajaController extends Controller
             [
                 'data' => $cajas,
                 'status' => 200,
+                'ok' => true,
                 'message' => 'Servicios obtenidos correctamente'
-            ]
+            ], 200
         );
     }
 
@@ -74,7 +79,7 @@ class CajaController extends Controller
             'data' => $caja, 
             'status' => 201,
             'ok' => true
-        ]);
+        ], 201);
     }
 
     public function update($id, Request $request) {
@@ -101,7 +106,7 @@ class CajaController extends Controller
             'data' => $caja, 
             'status' => 201,
             'ok' => true
-        ]);
+        ], 201);
     }
 
     public function cerrarCaja(Request $request) {
@@ -125,7 +130,7 @@ class CajaController extends Controller
             'data' => $caja, 
             'status' => 201,
             'ok' => true
-        ]);
+        ], 201);
     }
 
     public function getCerrarCaja($id, Request $request) {

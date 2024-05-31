@@ -22,7 +22,7 @@ class DetalleCreditoController extends Controller
                 'data' =>  $detalles,
                 'status' => 200,
                 'ok' => true
-            ]
+            ], 200
         );
     }
 }

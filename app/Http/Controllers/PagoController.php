@@ -94,7 +94,7 @@ class PagoController extends Controller
                 'data' =>  $this->prepararImprimirPago($pago->id),
                 'status' => 201,
                 'ok' => true
-            ]
+            ], 201
         );
     }
 
@@ -126,7 +126,7 @@ class PagoController extends Controller
                 'data' =>  $pago,
                 'status' => 201,
                 'ok' => true
-            ]
+            ], 201
         );
     }
 
@@ -140,7 +140,7 @@ class PagoController extends Controller
                 'data' =>  $pago,
                 'status' => 201,
                 'ok' => true
-            ]
+            ], 201
         );
     }
 
@@ -164,7 +164,7 @@ class PagoController extends Controller
                 'data' => array('codigogenerado' => $codigoGenerado, 'seriecorrelativo' => $seriecorrelativo, 'numerocorrelativo' => $numerocorrelativo),
                 'status' => 200,
                 'ok' => true
-            ]
+            ], 200
         );
     }
 
@@ -182,7 +182,7 @@ class PagoController extends Controller
                 'data' => array('numeropago' => $numeropago, 'codigopago' => $codigopago),
                 'status' => 200,
                 'ok' => true
-            ]
+            ],200
         );
     }
 

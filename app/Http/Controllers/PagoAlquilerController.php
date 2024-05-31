@@ -12,60 +12,39 @@ date_default_timezone_set('America/Lima');
 class PagoAlquilerController extends Controller
 {
     public function index(Request $request) {
-        try{
-            $pagoAlquileres = PagoAlquiler::where('estado', 1)->get();
+        $pagoAlquileres = PagoAlquiler::where('estado', 1)->get();
 
-            return response()->json(
-                [
-                    'data' => $pagoAlquileres,
-                    'status' => 200,
-                    'message' => 'Servicios obtenidos correctamente'
-                ]
-            );
-        }catch(Exception $ex){
-            return response()->json(
-                [
-                    'data' => [],
-                    'status' => 401,
-                    'error' => 'Error al ejecutar la operación'
-                ]
-            );
-        }
+        return response()->json([
+            'data' => $pagoAlquileres, 
+            'status' => 200,
+            'ok' => true
+        ],200);
     }
 
     public function indexFiltro($fecha_ini, $fecha_fin, Request $request) {
-        try{
-            $inicio = $fecha_ini!="null"?$fecha_ini:date("Y-m-01");
-            $fin = $fecha_fin!="null"?$fecha_fin:date("Y-m-t");
-            $pagoAlquileres = PagoAlquiler::select('pago_alquiler.id','pago_alquiler.tipo_banco_id','pago_alquiler.fecha','pago_alquiler.monto','pago_alquiler.descripcion',
-                'tipo_bancos.nombre as nom_tipoBanco')
-                ->join('tipo_bancos','pago_alquiler.tipo_banco_id', '=','tipo_bancos.id')
-                ->where('pago_alquiler.estado', 1)
-                ->whereBetween('pago_alquiler.fecha', [$inicio, $fin])->get();
+        $inicio = $fecha_ini!="null"?$fecha_ini:date("Y-m-01");
+        $fin = $fecha_fin!="null"?$fecha_fin:date("Y-m-t");
+        $pagoAlquileres = PagoAlquiler::select('pago_alquiler.id','pago_alquiler.tipo_banco_id','pago_alquiler.fecha','pago_alquiler.monto','pago_alquiler.descripcion',
+            'tipo_bancos.nombre as nom_tipoBanco')
+            ->join('tipo_bancos','pago_alquiler.tipo_banco_id', '=','tipo_bancos.id')
+            ->where('pago_alquiler.estado', 1)
+            ->whereBetween('pago_alquiler.fecha', [$inicio, $fin])->get();
 
-            return response()->json(
-                [
-                    'data' => $pagoAlquileres,
-                    'fecha1' => $inicio,
-                    'status' => 200,
-                    'message' => 'Servicios obtenidos correctamente'
-                ]
-            );
-        }catch(Exception $ex){
-            return response()->json(
-                [
-                    'data' => [],
-                    'status' => 401,
-                    'error' => 'Error al ejecutar la operación'
-                ]
-            );
-        }
+        return response()->json([
+            'data' => $pagoAlquileres, 
+            'status' => 200,
+            'ok' => true
+        ],200);
     }
 
     public function show($id, Request $request) {
         $pagoAlquiler = PagoAlquiler::find($id);
 
-        return response()->json($pagoAlquiler, 200);
+        return response()->json([
+            'data' => $pagoAlquiler, 
+            'status' => 200,
+            'ok' => true
+        ],200);
     }
 
     public function store(Request $request) {
@@ -93,7 +72,7 @@ class PagoAlquilerController extends Controller
             'data' => $pagoAlquiler, 
             'status' => 201,
             'ok' => true
-        ]);
+        ],201);
 
     }
 
@@ -122,8 +101,7 @@ class PagoAlquilerController extends Controller
             'data' => $pagoAlquiler, 
             'status' => 201,
             'ok' => true
-        ]);
-        
+        ],201);
     }
 
     public function destroy($id) {
