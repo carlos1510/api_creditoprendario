@@ -70,9 +70,9 @@ Route::middleware('jwt.verify')->group(function () {
     Route::delete('servicios/{id}', [ServicioController::class, 'destroy']);
 
     //Pagos
-    Route::get('pagos', [PagoController::class, 'index']);
     Route::get('pagos/{id}', [PagoController::class, 'show']);
     Route::get('pagos/comprobante/{id}', [PagoController::class, 'getUltimoNroComprobante']);
+    Route::get('pagos/{responID?}/{fecha1?}/{fecha2?}/{nrodoc?}', [PagoController::class, 'index']);
     Route::post('pagos', [PagoController::class, 'store']);
     Route::patch('pagos/{id}', [PagoController::class, 'update']);
     Route::delete('pagos/{id}', [PagoController::class, 'destroy']);

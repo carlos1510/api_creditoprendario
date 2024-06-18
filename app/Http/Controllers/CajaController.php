@@ -12,7 +12,12 @@ date_default_timezone_set('America/Lima');
 class CajaController extends Controller
 {
     public function index(Request $request) {
-        $cajas = Caja::all()->where('estado', 1);
+        if(auth()->user()->rol != "Administrador"){
+            $cajas = Caja::where('estado', 1)
+            ->where('empresa_id', auth()->user()->empresa_id)->get();
+        }else {
+            $cajas = Caja::where('estado', 1)->get();
+        }
 
         return response()->json([
             'data' => $cajas, 
@@ -25,15 +30,28 @@ class CajaController extends Controller
         $inicio = $fecha_ini!="null"?$fecha_ini:date("Y-m-01");
         $fin = $fecha_fin!="null"?$fecha_fin:date("Y-m-t");
 
-        $cajas = Caja::select("cajas.id", "cajas.fechaapertura", "cajas.horaapertura","cajas.montoinicial",
-        "cajas.fechacierre", "cajas.horacierre","cajas.montocobro","cajas.montocredito","cajas.montogasto",
-        "cajas.montocierre","cajas.estado", "cajas.user_id", "cajas.empresa_id", "b.numerodocumento",
-        "b.nombres", "b.apellidos", "cajas.interessocio")
-        ->join("users as b","cajas.user_id","=","b.id")
-            ->whereIn('estado', [1,2])
-            ->whereBetween('fechaapertura', [$inicio, $fin])
-            ->orderBy('cajas.created_at','desc')
-            ->get();
+        if(auth()->user()->rol != "Administrador"){
+            $cajas = Caja::select("cajas.id", "cajas.fechaapertura", "cajas.horaapertura","cajas.montoinicial",
+            "cajas.fechacierre", "cajas.horacierre","cajas.montocobro","cajas.montocredito","cajas.montogasto",
+            "cajas.montocierre","cajas.estado", "cajas.user_id", "cajas.empresa_id", "b.numerodocumento",
+            "b.nombres", "b.apellidos", "cajas.interessocio")
+            ->join("users as b","cajas.user_id","=","b.id")
+                ->whereIn('estado', [1,2])
+                ->where('cajas.empresa_id', auth()->user()->empresa_id)
+                ->whereBetween('fechaapertura', [$inicio, $fin])
+                ->orderBy('cajas.created_at','desc')
+                ->get();
+        }else {
+            $cajas = Caja::select("cajas.id", "cajas.fechaapertura", "cajas.horaapertura","cajas.montoinicial",
+            "cajas.fechacierre", "cajas.horacierre","cajas.montocobro","cajas.montocredito","cajas.montogasto",
+            "cajas.montocierre","cajas.estado", "cajas.user_id", "cajas.empresa_id", "b.numerodocumento",
+            "b.nombres", "b.apellidos", "cajas.interessocio")
+            ->join("users as b","cajas.user_id","=","b.id")
+                ->whereIn('estado', [1,2])
+                ->whereBetween('fechaapertura', [$inicio, $fin])
+                ->orderBy('cajas.created_at','desc')
+                ->get();
+        }
 
         return response()->json(
             [
@@ -71,7 +89,7 @@ class CajaController extends Controller
         $caja->interesnegocio = null;
         $caja->estado = 1;
         $caja->user_id = $request->user_id;
-        $caja->empresa_id = $request->empresa_id;
+        $caja->empresa_id = auth()->user()->empresa_id;
 
         $caja->save();
 
@@ -98,7 +116,7 @@ class CajaController extends Controller
         $caja->fechaapertura = Util::convertirStringFecha($request->fechaapertura, false);
         $caja->horaapertura = $request->horaapertura;
         $caja->montoinicial = $request->montoinicial;
-        $caja->user_id = $request->user_id;
+        $caja->user_id = isset($request->user_id)?$request->user_id:auth()->user()->id;
 
         $caja->update();
 
@@ -144,12 +162,12 @@ class CajaController extends Controller
             ROUND(IFNULL(SUM(a.interes_negocio), 0), 2) AS interesnegocio 
             FROM pagos a JOIN creditos b ON a.credito_id=b.id  
             WHERE a.estado=1 AND (a.fecha between '$caja->fechaapertura' AND '$fecha_actual')
-            AND a.empresa_id='$caja->empresa_id' AND a.user_id=$caja->user_id";
+            AND a.empresa_id='".auth()->user()->empresa_id."' AND a.user_id=$caja->user_id";
         $result_pago = DB::selectOne($sql_pago);
 
         $sql_credito = "SELECT IFNULL(SUM(a.total),0) AS total_prestamo 
             FROM creditos a 
-            WHERE a.estado=1 AND (a.fecha BETWEEN '$caja->fechaapertura' AND '$fecha_actual') AND a.empresa_id='$caja->empresa_id' AND a.user_id=$caja->user_id";
+            WHERE a.estado=1 AND (a.fecha BETWEEN '$caja->fechaapertura' AND '$fecha_actual') AND a.empresa_id='".auth()->user()->empresa_id."' AND a.user_id=$caja->user_id";
         $result_credito = DB::selectOne($sql_credito);
 
         /*$sql_gasto = "";
@@ -188,8 +206,8 @@ class CajaController extends Controller
     public function getAperturaCaja(Request $request) {
         $caja = Caja::selectRaw('DATEDIFF(CURDATE(),fechaapertura) as apertura_activo')
         ->where('estado', 1)
-        ->where('user_id',1)
-        ->where('empresa_id',1)
+        ->where('user_id',auth()->user()->id)
+        ->where('empresa_id',auth()->user()->empresa_id)
         ->first();
 
         return response()->json([

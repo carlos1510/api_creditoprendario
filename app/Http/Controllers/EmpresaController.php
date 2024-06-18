@@ -12,14 +12,14 @@ class EmpresaController extends Controller
 {
     public function index(Request $request) {
         $empresas = Empresa::where('estado', 1)->get();
-
+        
         return response()->json(
             [
                 'data' => $empresas,
                 'status' => 200,
                 'ok' => true,
                 'message' => 'Empresas obtenidos correctamente'
-            ]
+            ], 200
         );
     }
 
@@ -31,7 +31,6 @@ class EmpresaController extends Controller
                 'data' => $empresa,
                 'status' => 200,
                 'ok' => true,
-                'message' => 'Empresas obtenidos correctamente'
             ]
         );
     }

@@ -18,7 +18,7 @@ class CreatePagosTable extends Migration
 
             $table->integer('seriecorrelativo')->nullable();
             $table->integer('numerocorrelativo')->nullable();
-            $table->string('codigogenerado'. 25)->nullable();
+            $table->string('codigogenerado', 25)->nullable();
             $table->integer('numeropago')->nullable();
             $table->string('codigopago', 25)->nullable();
             $table->date('fecha');

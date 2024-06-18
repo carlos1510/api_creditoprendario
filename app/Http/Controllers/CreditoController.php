@@ -27,6 +27,7 @@ class CreditoController extends Controller
             ->join('servicios as c','creditos.servicio_id', '=','c.id')
             ->join('tipo_comprobantes as d','creditos.tipo_comprobante_id','=','d.id')
             ->whereIn('creditos.estado', [1,3])
+            ->where('creditos.empresa_id', auth()->user()->empresa_id)
             ->whereBetween('creditos.fecha', [$inicio, $fin])
             ->orderBy('creditos.fecha','desc')
             ->get();
@@ -38,7 +39,7 @@ class CreditoController extends Controller
                 FROM creditos a JOIN clientes b ON a.cliente_id=b.id 
                 JOIN servicios c on a.servicio_id=c.id 
                 JOIN tipo_comprobantes d ON a.tipo_comprobante_id=d.id
-                WHERE a.estado IN (1,3) 
+                WHERE a.estado IN (1,3) AND a.empresa_id=".auth()->user()->empresa_id."
                 ".(isset($fecha_ini)?($fecha_ini!="null"?(isset($fecha_fin)?($fecha_fin!="null"?" AND a.fecha BETWEEN '$fecha_ini' AND '$fecha_fin' ":""):""):""):"").
                 (isset($responsableId)?($responsableId!=0?" AND a.user_id=$responsableId ":""):"").
                 (isset($nro_documento)?($nro_documento!=0?" AND b.numerodocumento='$nro_documento'":""):"").
@@ -82,7 +83,7 @@ class CreditoController extends Controller
                             FROM creditos a 
                             JOIN clientes b ON a.cliente_id=b.id 
                             JOIN servicios c ON a.servicio_id=c.id 
-                            WHERE a.estado IN (1,3) and b.numerodocumento='$nro_documento' 
+                            WHERE a.estado IN (1,3) AND a.empresa_id=".auth()->user()->empresa_id." and b.numerodocumento='$nro_documento' 
                         ) AS t
                     ) AS t1");
         }
@@ -167,11 +168,11 @@ class CreditoController extends Controller
         $credito->descuento = $request->descuento;
         $credito->estados = 'ACTIVO';
         $credito->estado = 1;
-        $credito->user_id = $request->user_id;
+        $credito->user_id = auth()->user()->id;
         $credito->tipo_comprobante_id = $request->tipo_comprobante_id;
         $credito->cliente_id = $request->cliente_id;
         $credito->servicio_id = $request->servicio_id;
-        $credito->empresa_id = $request->empresa_id;
+        $credito->empresa_id = auth()->user()->empresa_id;
         $credito->save();
 
         foreach($request->detalle as $item){
@@ -333,10 +334,12 @@ class CreditoController extends Controller
     public function getUltimoNroComprobante($tipoComprobanteID, Request $request){
         $nroComprobante = Credito::selectRaw("IF(ISNULL(MAX(numerocorrelativo)), 0, MAX(numerocorrelativo)) AS numero")
             ->where('tipo_comprobante_id', $tipoComprobanteID)
+            ->where('empresa_id', auth()->user()->empresa_id)
             ->first();
 
         $nroSerie = Credito::selectRaw("IF(ISNULL(MAX(seriecorrelativo)), 0,MAX(seriecorrelativo)) as serie")
         ->where('tipo_comprobante_id', $tipoComprobanteID)
+        ->where('empresa_id', auth()->user()->empresa_id)
         ->first();
 
         $tipoComprobante = TipoComprobante::find($tipoComprobanteID);
@@ -356,7 +359,7 @@ class CreditoController extends Controller
 
     public function getUltimoNroCreditoContrato(){
         $nroCredito = Credito::selectRaw("IF(ISNULL(MAX(numerocredito)), 0, MAX(numerocredito)) AS numero")
-            ->where('empresa_id', 1)
+            ->where('empresa_id', auth()->user()->empresa_id)
             ->first();
 
         $nroContrato = Credito::selectRaw("IF(ISNULL(MAX(numerocontrato)), 0,MAX(numerocontrato)) as numero")
@@ -396,6 +399,7 @@ class CreditoController extends Controller
         ->join('clientes AS f','creditos.cliente_id','=','f.id')
         ->where('creditos.estado',1)
         ->where('creditos.id', $id)
+        ->where('creditos.empresa_id', auth()->user()->empresa_id)
         ->first();
 
         $detalles = DetalleCredito::where('estado',1)

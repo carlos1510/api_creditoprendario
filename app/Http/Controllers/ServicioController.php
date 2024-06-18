@@ -11,7 +11,12 @@ date_default_timezone_set('America/Lima');
 class ServicioController extends Controller
 {
     public function index(Request $request){
+       if(auth()->user()->rol != 'Administrador'){
+        $servicios = Servicio::where('estado', 1)
+        ->where('empresa_id',auth()->user()->empresa_id)->get();
+       }else{
         $servicios = Servicio::where('estado', 1)->get();
+       }
 
         return response()->json(
             [
@@ -57,7 +62,7 @@ class ServicioController extends Controller
         $servicio->porcentajenegocio = $request->porcentajenegocio;
         $servicio->porcentaje = $request->porcentaje;
         $servicio->estado = 1;
-        $servicio->empresa_id = $request->empresa_id;
+        $servicio->empresa_id = auth()->user()->empresa_id;
 
         $servicio->save();
 

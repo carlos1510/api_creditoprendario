@@ -14,6 +14,7 @@ class ClienteController extends Controller
         $data = array('tipodocumento' => $tipodocumento, 'numerodocumento' => $numerodocumento, 'nombrescliente' => '');
         $cliente = Cliente::where('tipodocumento', $tipodocumento)
                 ->where('numerodocumento', $numerodocumento)
+                ->where('empresa_id', auth()->user()->empresa_id)
                 ->first();
 
         if(!isset($cliente->id)){

@@ -133,34 +133,34 @@ class AuthController extends Controller
         $user->acceso = $request->acceso;
         $user->rol = $request->rol;
 
-        $user->empresa_id = $request->has('empresa_id') ? $request->empresa_id : null;
+        $user->empresa_id = isset($request->empresa_id)?$request->empresa_id:auth()->user()->empresa_id;
 
         $user->save();
 
-        return response()->json($user, 201);
+        return response()->json(
+            [
+                'data' => $user,
+                'status' => 201,
+                'ok' => true,
+            ],201
+        );
     }
 
     public function index(Request $request) {
         
-        try{
+        if(auth()->user()->rol != "Administrador"){
+            $usuarios = User::where('empresa_id',auth()->user()->empresa_id)->get();
+        }else{
             $usuarios = User::all();
-
-            return response()->json(
-                [
-                    'data' => $usuarios,
-                    'status' => 200,
-                    'message' => 'Usuarios obtenidos correctamente'
-                ],200
-            );
-        }catch(JWTException $ex){
-            return response()->json(
-                [
-                    'data' => [],
-                    'status' => 401,
-                    'error' => 'Error al ejecutar la operación'
-                ], 401
-            );
         }
+
+        return response()->json(
+            [
+                'data' => $usuarios,
+                'status' => 200,
+                'ok' => true
+            ],200
+        );
     }
 
     public function update($id, Request $request) {
@@ -191,11 +191,17 @@ class AuthController extends Controller
 
         $user->update();
 
-        return response()->json($user, 201);
+        return response()->json(
+            [
+                'data' => $user,
+                'status' => 201,
+                'ok' => true,
+            ],201
+        );
     }
 
     public function getUsersByEmpresa(Request $request) {
-        $usuarios = User::where('empresa_id',1)
+        $usuarios = User::where('empresa_id', auth()->user()->empresa_id)
         ->where('acceso',1)
         ->get();
 
@@ -204,7 +210,7 @@ class AuthController extends Controller
                 'data' => $usuarios,
                 'status' => 200,
                 'ok' => true
-            ]
+            ], 200
         );
     }
 
@@ -249,7 +255,7 @@ class AuthController extends Controller
                 'data' => $data, 
                 'status' => 201,
                 'ok' => true
-            ]);
+            ], 201);
         }
     }
 

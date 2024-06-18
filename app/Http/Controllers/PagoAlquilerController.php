@@ -12,7 +12,13 @@ date_default_timezone_set('America/Lima');
 class PagoAlquilerController extends Controller
 {
     public function index(Request $request) {
-        $pagoAlquileres = PagoAlquiler::where('estado', 1)->get();
+        if(auth()->user()->rol != 'Administrador'){
+            $pagoAlquileres = PagoAlquiler::where('estado', 1)
+            ->where('user_id', auth()->user()->id)
+            ->get();
+        }else{
+            $pagoAlquileres = PagoAlquiler::where('estado', 1)->get();
+        }
 
         return response()->json([
             'data' => $pagoAlquileres, 
@@ -24,11 +30,20 @@ class PagoAlquilerController extends Controller
     public function indexFiltro($fecha_ini, $fecha_fin, Request $request) {
         $inicio = $fecha_ini!="null"?$fecha_ini:date("Y-m-01");
         $fin = $fecha_fin!="null"?$fecha_fin:date("Y-m-t");
-        $pagoAlquileres = PagoAlquiler::select('pago_alquiler.id','pago_alquiler.tipo_banco_id','pago_alquiler.fecha','pago_alquiler.monto','pago_alquiler.descripcion',
+        if(auth()->user()->rol !="Administrador"){
+            $pagoAlquileres = PagoAlquiler::select('pago_alquiler.id','pago_alquiler.tipo_banco_id','pago_alquiler.fecha','pago_alquiler.monto','pago_alquiler.descripcion',
+            'tipo_bancos.nombre as nom_tipoBanco')
+            ->join('tipo_bancos','pago_alquiler.tipo_banco_id', '=','tipo_bancos.id')
+            ->where('pago_alquiler.estado', 1)
+            ->where('pago_alquiler.user_id', auth()->user()->id)
+            ->whereBetween('pago_alquiler.fecha', [$inicio, $fin])->get();
+        }else{
+            $pagoAlquileres = PagoAlquiler::select('pago_alquiler.id','pago_alquiler.tipo_banco_id','pago_alquiler.fecha','pago_alquiler.monto','pago_alquiler.descripcion',
             'tipo_bancos.nombre as nom_tipoBanco')
             ->join('tipo_bancos','pago_alquiler.tipo_banco_id', '=','tipo_bancos.id')
             ->where('pago_alquiler.estado', 1)
             ->whereBetween('pago_alquiler.fecha', [$inicio, $fin])->get();
+        }
 
         return response()->json([
             'data' => $pagoAlquileres, 
@@ -65,7 +80,7 @@ class PagoAlquilerController extends Controller
         $pagoAlquiler->rutaimagen = null;
         $pagoAlquiler->estado = 1;
         $pagoAlquiler->tipo_banco_id = $request->tipo_banco_id;
-        $pagoAlquiler->user_id = $request->user_id;
+        $pagoAlquiler->user_id = isset($request->user_id)?$request->user_id:auth()->user()->id;
         $pagoAlquiler->save();
 
         return response()->json([

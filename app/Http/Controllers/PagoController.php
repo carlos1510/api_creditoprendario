@@ -7,15 +7,40 @@ use App\Models\Credito;
 use App\Models\Pago;
 use App\Models\TipoComprobante;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 date_default_timezone_set('America/Lima');
 
 class PagoController extends Controller
 {
-    public function index(Request $request){
-        $pagos = Pago::all()->where('estado', 1);
-
-        return response()->json($pagos);
+    public function index($responsableId, $fecha_ini, $fecha_fin, $nro_documento, Request $request){
+        $sql = "SELECT pagos.fecha,pagos.monto,pagos.interes, pagos.capital, pagos.total, pagos.fechavencimientoanterior,
+        pagos.codigocredito, pagos.codigocontrato, pagos.interes_socio, pagos.igv, pagos.codigogenerado, pagos.codigopago, 
+        pagos.montorestante, pagos.totalinteressocio, pagos.interes_negocio, pagos.nro_dias, pagos.tiposervicio, pagos.nuevocapital,
+        pagos.plazo, pagos.fechavencimientonuevo, a.descripcion_bien, b.nombre AS nombre_empresa, b.nombrenegocio, b.direccion AS direccion_empresa,
+        e.nombre AS nom_tipo_comprobante, c.nombres AS nombres_cajero,
+        b.numerodocumento AS nrodoc_empresa, nombrescliente, d.numerodocumento AS nrodoc_cliente,
+        DATE_FORMAT(pagos.created_at, '%H:%i:%s') AS hora,
+         IF(a.tipo_comprobante_id=1,'DNI','RUC') AS descripcion_tipo_doc_empresa
+				FROM pagos JOIN creditos a ON pagos.credito_id=a.id 
+				JOIN tipo_comprobantes e ON pagos.tipo_comprobante_id = e.id
+                JOIN servicios f ON a.servicio_id =f.id
+                JOIN empresas b ON pagos.empresa_id = b.id
+                JOIN users c ON pagos.user_id = c.id
+                JOIN clientes d ON a.cliente_id=d.id
+                WHERE pagos.estado=1 AND pagos.empresa_id=".auth()->user()->empresa_id."
+                ".(isset($fecha_ini)?($fecha_ini!="null"?(isset($fecha_fin)?($fecha_fin!="null"?" AND pagos.fecha BETWEEN '$fecha_ini' AND '$fecha_fin' ":""):""):""):"").
+                (isset($responsableId)?($responsableId!=0?" AND pagos.user_id=$responsableId ":""):"").
+                (isset($nro_documento)?($nro_documento!=0?" AND d.numerodocumento='$nro_documento'":""):"").
+                " ORDER BY pagos.fecha desc";
+            $pagos = DB::select($sql);
+        return response()->json(
+            [
+                'data' =>  $pagos,
+                'status' => 200,
+                'ok' => true
+            ], 200
+        );
     }
 
     public function show($id, Request $request) {
@@ -62,8 +87,8 @@ class PagoController extends Controller
         $pago->estado = 1;
         $pago->tipo_comprobante_id = $request->tipo_comprobante_id;
         //$pago->user_id = $request->user()->id;
-        $pago->user_id = $request->user_id;
-        $pago->empresa_id = $request->empresa_id;
+        $pago->user_id = auth()->user()->id;
+        $pago->empresa_id = auth()->user()->empresa_id;
         $pago->credito_id = $request->credito_id;
 
         $pago->nuevocapital = $pago->montorestante;
@@ -147,10 +172,12 @@ class PagoController extends Controller
     public function getUltimoNroComprobante($tipoComprobanteID, Request $request){
         $nroComprobante = Pago::selectRaw("IF(ISNULL(MAX(numerocorrelativo)), 0, MAX(numerocorrelativo)) AS numero")
             ->where('tipo_comprobante_id', $tipoComprobanteID)
+            ->where('empresa_id', auth()->user()->empresa_id)
             ->first();
 
         $nroSerie = Pago::selectRaw("IF(ISNULL(MAX(seriecorrelativo)), 0,MAX(seriecorrelativo)) as serie")
         ->where('tipo_comprobante_id', $tipoComprobanteID)
+        ->where('empresa_id', auth()->user()->empresa_id)
         ->first();
 
         $tipoComprobante = TipoComprobante::find($tipoComprobanteID);
@@ -170,7 +197,7 @@ class PagoController extends Controller
 
     public function getUltimoNroPago(){
         $nroPago = Pago::selectRaw("IF(ISNULL(MAX(numeropago)), 0, MAX(numeropago)) AS numero")
-            ->where('empresa_id', 1)
+            ->where('empresa_id', auth()->user()->empresa_id)
             ->first();
 
         $codigopago = sprintf("%010d", ($nroPago->numero + 1));
@@ -203,6 +230,7 @@ class PagoController extends Controller
         ->join('users AS c','pagos.user_id','=','c.id')
         ->join('clientes AS d','a.cliente_id','=','d.id')
         ->where('pagos.estado',1)
+        ->where('pagos.empresa_id', auth()->user()->empresa_id)
         ->where('pagos.id', $id)
         ->first();
 
