@@ -188,6 +188,11 @@ class AuthController extends Controller
         $user->email = $request->email;
         $user->acceso = $request->acceso;
         $user->rol = $request->rol;
+        $user->empresa_id = isset($request->empresa_id)?$request->empresa_id:auth()->user()->empresa_id;
+
+        if(isset($request->password)){
+            $user->password = bcrypt($request->password);
+        }
 
         $user->update();
 
