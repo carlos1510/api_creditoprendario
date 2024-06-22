@@ -129,6 +129,8 @@ class CreditoController extends Controller
             $cliente->latitud = $request->latitud;
             $cliente->longitud = $request->longitud;
             $cliente->estado = 1;
+            $cliente->empresa_id = auth()->user()->empresa_id;
+            $cliente->user_id = auth()->user()->id;
             $cliente->save();
 
             $request->merge(['cliente_id' => $cliente->id]);
