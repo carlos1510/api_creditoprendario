@@ -14,7 +14,7 @@ date_default_timezone_set('America/Lima');
 class PagoController extends Controller
 {
     public function index($responsableId, $fecha_ini, $fecha_fin, $nro_documento, Request $request){
-        $sql = "SELECT pagos.fecha,pagos.monto,pagos.interes, pagos.capital, pagos.total, pagos.fechavencimientoanterior,
+        $sql = "SELECT pagos.id, pagos.fecha,pagos.monto,pagos.interes, pagos.capital, pagos.total, pagos.fechavencimientoanterior,
         pagos.codigocredito, pagos.codigocontrato, pagos.interes_socio, pagos.igv, pagos.codigogenerado, pagos.codigopago, 
         pagos.montorestante, pagos.totalinteressocio, pagos.interes_negocio, pagos.nro_dias, pagos.tiposervicio, pagos.nuevocapital,
         pagos.plazo, pagos.fechavencimientonuevo, a.descripcion_bien, b.nombre AS nombre_empresa, b.nombrenegocio, b.direccion AS direccion_empresa,
