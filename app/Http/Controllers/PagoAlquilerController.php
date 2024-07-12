@@ -32,15 +32,19 @@ class PagoAlquilerController extends Controller
         $fin = $fecha_fin!="null"?$fecha_fin:date("Y-m-t");
         if(auth()->user()->rol !="Administrador"){
             $pagoAlquileres = PagoAlquiler::select('pago_alquiler.id','pago_alquiler.tipo_banco_id','pago_alquiler.fecha','pago_alquiler.monto','pago_alquiler.descripcion',
-            'tipo_bancos.nombre as nom_tipoBanco')
+            'tipo_bancos.nombre as nom_tipoBanco','b.estadoactivacion','b.estadopago','b.id as saldo_alquiler_id')
+            ->selectRaw("IF(DATEDIFF(b.fecha_final,CURDATE())<=0,0,DATEDIFF(b.fecha_final,CURDATE())) AS saldo")
             ->join('tipo_bancos','pago_alquiler.tipo_banco_id', '=','tipo_bancos.id')
+            ->leftjoin('saldo_alquiler as b','pago_alquiler.id','=','b.pago_alquiler_id')
             ->where('pago_alquiler.estado', 1)
             ->where('pago_alquiler.user_id', auth()->user()->id)
             ->whereBetween('pago_alquiler.fecha', [$inicio, $fin])->get();
         }else{
             $pagoAlquileres = PagoAlquiler::select('pago_alquiler.id','pago_alquiler.tipo_banco_id','pago_alquiler.fecha','pago_alquiler.monto','pago_alquiler.descripcion',
-            'tipo_bancos.nombre as nom_tipoBanco')
+            'tipo_bancos.nombre as nom_tipoBanco','b.estadoactivacion','b.estadopago','b.id as saldo_alquiler_id')
+            ->selectRaw("IF(DATEDIFF(b.fecha_final,CURDATE())<=0,0,DATEDIFF(b.fecha_final,CURDATE())) AS saldo")
             ->join('tipo_bancos','pago_alquiler.tipo_banco_id', '=','tipo_bancos.id')
+            ->leftjoin('saldo_alquiler as b','pago_alquiler.id','=','b.pago_alquiler_id')
             ->where('pago_alquiler.estado', 1)
             ->whereBetween('pago_alquiler.fecha', [$inicio, $fin])->get();
         }

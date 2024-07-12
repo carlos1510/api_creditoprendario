@@ -17,7 +17,7 @@ class CreateSaldoalquilerTable extends Migration
             $table->id();
             $table->date('fecha_inicio');
             $table->date('fecha_final');
-            $table->integer('saldo');
+            $table->integer('saldo')->nullable();
             $table->integer('estadoactivacion');
             $table->integer('estadopago');
 

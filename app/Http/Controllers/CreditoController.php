@@ -67,17 +67,18 @@ class CreditoController extends Controller
                            SELECT t.id, t.fecha, t.fechalimite, t.descripcion_bien, t.numerodocumento, t.nombrescliente, t.nro_dias, t.codigocontrato, t.codigocredito, t.tiposervicio,
                            concat(t.nro_perio_calculado, ' días') as plazo,
 
-                           if(t.nro_dias<31, ROUND((((t.monto*(t.porcentajesocio/100))/t.nro_perio_calculado)*t.nro_dias), 2), 
-                           ROUND(((((ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto)*(t.porcentajesocio/100))/t.nro_perio_calculado)*t.nro_dias), 2) ) AS interes_socio,
+                           if(t.nro_mes>0, ROUND(((((ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto)*(t.porcentajesocio/100))/t.nro_perio_calculado)*(t.nro_dias-30)), 2),
+													 ROUND((((t.monto*(t.porcentajesocio/100))/t.nro_perio_calculado)*t.nro_dias), 2)) AS interes_socio,
 
-                           if(t.nro_dias<31, ROUND((((t.monto*(t.porcentajenegocio/100))/t.nro_perio_calculado)*t.nro_dias), 2), 
-                           ROUND(((((ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto)*(t.porcentajenegocio/100))/t.nro_perio_calculado)*t.nro_dias), 2) ) AS interes_negocio,
+                           if(t.nro_mes>0, ROUND(((((ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto)*(t.porcentajenegocio/100))/t.nro_perio_calculado)*(t.nro_dias-30)), 2), 
+													 ROUND((((t.monto*(t.porcentajenegocio/100))/t.nro_perio_calculado)*t.nro_dias), 2) ) AS interes_negocio,
                            
-                           IF(t.nro_dias<31, t.monto, (ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto)) AS monto 
+                           IF(t.nro_mes>0, (ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto), t.monto) AS monto 
                                FROM 
                         (SELECT a.id, a.fecha, a.fechalimite, a.total, a.monto, a.descripcion_bien, a.codigocredito, a.codigocontrato    
                             ,b.numerodocumento, b.nombrescliente, c.tiposervicio,
                             DATEDIFF(CURDATE(),a.fecha) AS nro_dias,
+														(DATEDIFF(CURDATE(),a.fecha)%30) AS nro_mes,
                             IF(c.periodo='DIAS', c.numeroperiodo, IF(periodo='SEMANAS', c.numeroperiodo * 7, IF(c.periodo='MES', c.numeroperiodo * 30, 0))) AS nro_perio_calculado,
                             c.porcentajesocio, c.porcentajenegocio, c.porcentaje
                             FROM creditos a 
