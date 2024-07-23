@@ -216,4 +216,18 @@ class CajaController extends Controller
             'ok' => true
         ]);
     }
+
+    public function getUltimoMontoCierre($iduser, Request $request) {
+        $caja = Caja::select("montocierre")
+        ->where('user_id', $iduser)
+        ->where('empresa_id', auth()->user()->empresa_id)
+        ->orderBy('created_at', 'desc')
+        ->first();
+
+        return response()->json([
+            'data' => $caja, 
+            'status' => 200,
+            'ok' => true
+        ]);
+    }
 }

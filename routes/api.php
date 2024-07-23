@@ -45,7 +45,8 @@ Route::middleware('jwt.verify')->group(function () {
     //Caja
     Route::get('cajas', [CajaController::class, 'index']);
     Route::get('cajas/{id}', [CajaController::class, 'getCerrarCaja']);
-    Route::get('cajas/{fecha1?}/{fecha2}', [CajaController::class, 'indexFilter']);
+    Route::get('cajas/{fecha1}/{fecha2}', [CajaController::class, 'indexFilter']);
+    Route::get('cajas/ultimocierre/monto/{iduser}', [CajaController::class, 'getUltimoMontoCierre']);
     Route::post('cajas', [CajaController::class, 'store']);
     Route::patch('cajas/{id}', [CajaController::class, 'update']);
     Route::post('cajas/cierre', [CajaController::class, 'cerrarCaja']);
