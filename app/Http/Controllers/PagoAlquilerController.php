@@ -15,6 +15,7 @@ class PagoAlquilerController extends Controller
         if(auth()->user()->rol != 'Administrador'){
             $pagoAlquileres = PagoAlquiler::where('estado', 1)
             ->where('user_id', auth()->user()->id)
+            ->orderBy('created_at', 'desc')
             ->get();
         }else{
             $pagoAlquileres = PagoAlquiler::where('estado', 1)->get();
@@ -38,7 +39,9 @@ class PagoAlquilerController extends Controller
             ->leftjoin('saldo_alquiler as b','pago_alquiler.id','=','b.pago_alquiler_id')
             ->where('pago_alquiler.estado', 1)
             ->where('pago_alquiler.user_id', auth()->user()->id)
-            ->whereBetween('pago_alquiler.fecha', [$inicio, $fin])->get();
+            ->whereBetween('pago_alquiler.fecha', [$inicio, $fin])
+            ->orderBy('pago_alquiler.created_at', 'desc')
+            ->get();
         }else{
             $pagoAlquileres = PagoAlquiler::select('pago_alquiler.id','pago_alquiler.tipo_banco_id','pago_alquiler.fecha','pago_alquiler.monto','pago_alquiler.descripcion',
             'tipo_bancos.nombre as nom_tipoBanco','b.estadoactivacion','b.estadopago','b.id as saldo_alquiler_id')
@@ -46,7 +49,9 @@ class PagoAlquilerController extends Controller
             ->join('tipo_bancos','pago_alquiler.tipo_banco_id', '=','tipo_bancos.id')
             ->leftjoin('saldo_alquiler as b','pago_alquiler.id','=','b.pago_alquiler_id')
             ->where('pago_alquiler.estado', 1)
-            ->whereBetween('pago_alquiler.fecha', [$inicio, $fin])->get();
+            ->whereBetween('pago_alquiler.fecha', [$inicio, $fin])
+            ->orderBy('pago_alquiler.created_at', 'desc')
+            ->get();
         }
 
         return response()->json([
@@ -85,6 +90,7 @@ class PagoAlquilerController extends Controller
         $pagoAlquiler->estado = 1;
         $pagoAlquiler->tipo_banco_id = $request->tipo_banco_id;
         $pagoAlquiler->user_id = isset($request->user_id)?$request->user_id:auth()->user()->id;
+        $pagoAlquiler->empresa_id = auth()->user()->empresa_id;
         $pagoAlquiler->save();
 
         return response()->json([

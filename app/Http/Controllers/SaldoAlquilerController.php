@@ -4,18 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\SaldoAlquiler;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 date_default_timezone_set('America/Lima');
 
 class SaldoAlquilerController extends Controller
 {
+    public function show(Request $request) {
+        $saldoAlquiler = DB::selectOne("SELECT IF(DATEDIFF(MAX(sa.fecha_final),CURDATE())<=0,0,DATEDIFF(MAX(sa.fecha_final),CURDATE())) AS saldo, DATE_FORMAT(MAX(sa.fecha_final),'%d/%m/%Y') AS fecha, sa.estadopago
+                    FROM saldo_alquiler sa INNER JOIN pago_alquiler pa ON sa.pago_alquiler_id=pa.id
+                     WHERE pa.empresa_id=? GROUP BY sa.estadopago LIMIT 1", [auth()->user()->empresa_id]);
+
+        return response()->json([
+            'data' => $saldoAlquiler, 
+            'status' => 200,
+            'ok' => true
+        ],200);
+    }
+
     public function store(Request $request) {
         $validator = Validator::make($request->all(), [
             'fecha_inicio' => 'required',
             'fecha_final' => 'required',
-            'saldo' => 'required',
             'estadoactivacion' => 'required',
-            'estadopago' => 'required',
             'estadopago' => 'required',
         ]);
 
@@ -36,4 +47,5 @@ class SaldoAlquilerController extends Controller
             'message' => 'Saldo Alquiler creado', 'status' => 201]
         );
     }
+
 }

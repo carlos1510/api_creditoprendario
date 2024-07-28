@@ -10,6 +10,7 @@ use App\Http\Controllers\PagoAlquilerController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\SaldoAlquilerController;
 use App\Http\Controllers\ServicioController;
+use App\Models\SaldoAlquiler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -90,6 +91,7 @@ Route::middleware('jwt.verify')->group(function () {
 
     //SaldoAlquiler
     Route::post('saldoalquileres', [SaldoAlquilerController::class, 'store']);
+    Route::get('saldoalquileres', [SaldoAlquilerController::class, 'show']);
 
     //Usuarios
     Route::get('usuarios', [AuthController::class, 'index']);
