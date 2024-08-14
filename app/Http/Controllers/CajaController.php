@@ -165,7 +165,7 @@ class CajaController extends Controller
             AND a.empresa_id='".auth()->user()->empresa_id."' AND a.user_id=$caja->user_id";
         $result_pago = DB::selectOne($sql_pago);
 
-        $sql_credito = "SELECT IFNULL(SUM(a.total),0) AS total_prestamo 
+        $sql_credito = "SELECT IFNULL(SUM(a.monto),0) AS total_prestamo 
             FROM creditos a 
             WHERE a.estado=1 AND (a.fecha BETWEEN '$caja->fechaapertura' AND '$fecha_actual') AND a.empresa_id='".auth()->user()->empresa_id."' AND a.user_id=$caja->user_id";
         $result_credito = DB::selectOne($sql_credito);
