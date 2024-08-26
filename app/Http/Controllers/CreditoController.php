@@ -178,22 +178,34 @@ class CreditoController extends Controller
         $credito->empresa_id = auth()->user()->empresa_id;
         $credito->save();
 
-        foreach($request->detalle as $item){
-            $item = (object)$item;
-
+        if($request->servicio_id != 4){
+            foreach($request->detalle as $item){
+                $item = (object)$item;
+    
+                $detalle = new DetalleCredito();
+                $detalle->descripcion = $item->descripcion;
+                $detalle->valor1 = $item->valor1;
+                $detalle->valor2 = $item->valor2;
+                $detalle->valor3 = $item->valor3;
+                $detalle->observaciones = $item->observaciones;
+                $detalle->valorizacion = $item->valorizacion;
+                $detalle->estado = 1;
+                $detalle->credito_id = $credito->id;
+                $detalle->servicio_id = $request->servicio_id;
+    
+                $detalle->save();
+            }
+        }else{
             $detalle = new DetalleCredito();
-            $detalle->descripcion = $item->descripcion;
-            $detalle->valor1 = $item->valor1;
-            $detalle->valor2 = $item->valor2;
-            $detalle->valor3 = $item->valor3;
-            $detalle->observaciones = $item->observaciones;
-            $detalle->valorizacion = $item->valorizacion;
-            $detalle->estado = 1;
-            $detalle->credito_id = $credito->id;
-            $detalle->servicio_id = $request->servicio_id;
-
-            $detalle->save();
+                $detalle->descripcion = "PRESTAMO EFECTIVO";
+                $detalle->valorizacion = $request->monto;
+                $detalle->estado = 1;
+                $detalle->credito_id = $credito->id;
+                $detalle->servicio_id = $request->servicio_id;
+    
+                $detalle->save();
         }
+        
 
         return response()->json(
             [
