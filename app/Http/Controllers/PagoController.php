@@ -220,7 +220,7 @@ class PagoController extends Controller
         'pagos.plazo', 'pagos.fechavencimientonuevo', 
         'a.descripcion_bien','b.nombre AS nombre_empresa', 'b.nombrenegocio','b.direccion AS direccion_empresa',
         'e.nombre AS nom_tipo_comprobante',"c.nombres AS nombres_cajero",
-        'b.numerodocumento AS nrodoc_empresa', 'nombrescliente','d.numerodocumento AS nrodoc_cliente')
+        'b.numerodocumento AS nrodoc_empresa', 'nombrescliente','d.numerodocumento AS nrodoc_cliente', 'b.razonsocial', 'b.razonsocialsocio', 'b.rucsocio')
         ->selectRaw("DATE_FORMAT(pagos.created_at, '%H:%i:%s') AS hora")
         ->selectRaw(" IF(a.tipo_comprobante_id=1,'DNI','RUC') AS descripcion_tipo_doc_empresa")
         ->join('creditos AS a','pagos.credito_id','=','a.id')

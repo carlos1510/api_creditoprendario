@@ -398,7 +398,8 @@ class CreditoController extends Controller
     public function prepararImprimirCredito($id){
         $pago = Credito::select('d.nombre AS nombre_empresa', 'd.direccion AS direccion_empresa', 'd.numerodocumento AS nrodoc_empresa', 'creditos.codigocredito',
         'creditos.monto', 'creditos.fechalimite', 'creditos.codigogenerado', 'b.nombre AS nom_tipo_comprobante', 'd.nombrenegocio', 'creditos.codigocontrato','creditos.servicio_id',
-        'c.tiposervicio', 'e.nombres AS nombres_cajero', 'f.nombrescliente', 'f.numerodocumento AS nrodoc_cliente','f.direccion AS direccioncliente','creditos.fecha')
+        'c.tiposervicio', 'e.nombres AS nombres_cajero', 'f.nombrescliente', 'f.numerodocumento AS nrodoc_cliente','f.direccion AS direccioncliente','creditos.fecha',
+        'd.razonsocial', 'd.razonsocialsocio')
         ->selectRaw("DATE_FORMAT(creditos.created_at, '%H:%i:%s') AS hora")
         ->selectRaw("IF(creditos.tipo_comprobante_id=1,'DNI','RUC') AS descripcion_tipo_doc_empresa")
         ->selectRaw("CONCAT(IF(c.periodo='MES', (30*c.numeroperiodo), 0), ' Dias') AS plazo")

@@ -17,6 +17,7 @@ class CreateEmpresasTable extends Migration
             $table->id();
             $table->string('nombrenegocio', 100);
             $table->integer('tipodocumentoid');
+            $table->string('razonsocial', 100)->nullable();
             $table->string('nombre', 100);
             $table->string('numerodocumento', 15);
             $table->string('email', 100)->nullable();
@@ -26,6 +27,9 @@ class CreateEmpresasTable extends Migration
             $table->integer('gps')->nullable();
             $table->string('tipomoneda', 15)->nullable();
             $table->string('simbolomoneda', 5)->nullable();
+            $table->string('rucsocio', 15)->nullable();
+            $table->string('razonsocialsocio', 100)->nullable();
+            $table->string('razonsocial', 100)->nullable();
 
             $table->boolean('estado');
 
