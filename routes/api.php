@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\CreditoController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DetalleCreditoController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\PagoAlquilerController;
@@ -11,7 +12,6 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\SaldoAlquilerController;
 use App\Http\Controllers\ServicioController;
 use App\Models\SaldoAlquiler;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -103,6 +103,10 @@ Route::middleware('jwt.verify')->group(function () {
 
     //DetalleCreditos
     Route::get('detallecreditos/creditos/{idcredito}', [DetalleCreditoController::class, 'obtenerDetalleByIdCredito']);
+
+    //Dashboard
+    Route::get('dashboard/{fecha1}/{fecha2}', [DashboardController::class, 'index']);
+
     
 });
 

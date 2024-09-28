@@ -50,6 +50,7 @@ class EmpresaController extends Controller
         $empresa = new Empresa();
         $empresa->nombrenegocio = strtoupper($request->nombrenegocio);
         $empresa->tipodocumentoid = $request->tipodocumentoid;
+        $empresa->razonsocial = $request->razonsocial;
         $empresa->nombre = strtoupper($request->nombre);
         $empresa->numerodocumento = $request->numerodocumento;
         $empresa->email = isset($request->email)?$request->email:null;
@@ -74,6 +75,8 @@ class EmpresaController extends Controller
         $empresa->gps = isset($request->gps)?$request->gps:0;
         $empresa->tipomoneda = isset($request->tipomoneda)?$request->tipomoneda:'PEN';
         $empresa->simbolomoneda = isset($request->simbolomoneda)?$request->simbolomoneda:'S/.';
+        $empresa->rucsocio = isset($request->rucsocio)?$request->rucsocio:null;
+        $empresa->razonsocialsocio = isset($request->razonsocialsocio)?strtoupper($request->razonsocialsocio):null;
         $empresa->estado = 1;
 
         $empresa->save();
@@ -100,6 +103,7 @@ class EmpresaController extends Controller
 
         $empresa->nombrenegocio = strtoupper($request->nombrenegocio);
         $empresa->tipodocumentoid = $request->tipodocumentoid;
+        $empresa->razonsocial = $request->razonsocial;
         $empresa->nombre = strtoupper($request->nombre);
         $empresa->numerodocumento = $request->numerodocumento;
         $empresa->email = $request->email;
@@ -120,6 +124,9 @@ class EmpresaController extends Controller
         }else {
             $empresa->rutaimagen = null;
         }
+
+        $empresa->rucsocio = isset($request->rucsocio)?$request->rucsocio:null;
+        $empresa->razonsocialsocio = isset($request->razonsocialsocio)?strtoupper($request->razonsocialsocio):null;
 
         $empresa->update();
 
