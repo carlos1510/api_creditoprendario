@@ -60,7 +60,7 @@ class CreditoController extends Controller
         if($nro_documento != ""){
             $creditos = DB::select("SELECT t1.id, t1.fecha, t1.fechalimite, t1.monto, t1.descripcion_bien, t1.numerodocumento, t1.nombrescliente, 
                     t1.interes_socio, t1.interes_negocio,	t1.nro_dias, t1.tiposervicio, t1.codigocontrato, t1.codigocredito, t1.plazo,
-                    ROUND((t1.interes_socio*0.18),2) AS igv
+                    ROUND((t1.interes_socio*0.18),2) AS igv, DATEDIFF(t1.fechalimite, CURDATE()) AS intervalo 
                     FROM 
                     (
                        

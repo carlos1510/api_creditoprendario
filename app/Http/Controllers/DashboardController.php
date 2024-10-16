@@ -36,16 +36,18 @@ class DashboardController extends Controller
         $sql_monto_cobrado = "SELECT ROUND(SUM(c.monto), 2) AS montocobrado
             FROM creditos a JOIN pagos c ON c.credito_id=a.id AND c.estado=1 
             WHERE a.estado IN (2, 3)
-            AND a.empresa_id=? AND (a.fecha BETWEEN ? AND ?)";
+            AND a.empresa_id=? AND (a.fecha BETWEEN ? AND ?) AND (c.fecha BETWEEN ? AND ?)";
         
         $data['total_cobrado'] = DB::selectOne($sql_monto_cobrado, [
             auth()->user()->empresa_id,
+            $inicio,
+            $fin,
             $inicio,
             $fin
         ]);
 
         $sql_total_capital = "SELECT ROUND(SUM(a.monto), 2) AS montocapital
-            FROM creditos a JOIN clientes b ON a.cliente_id=b.id and b.estado=1 WHERE a.estado IN (1, 3)
+            FROM creditos a JOIN clientes b ON a.cliente_id=b.id and b.estado=1 WHERE a.estado IN (1, 2, 3)
             AND a.empresa_id=? AND (a.fecha BETWEEN ? AND ?)";
 
         $data['total_capital'] = DB::selectOne($sql_total_capital, [
@@ -58,14 +60,14 @@ class DashboardController extends Controller
                     FROM 
                     (
                            SELECT 
-                           if(t.nro_mes>1.01, ROUND(((((ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto)*(t.porcentajesocio/100))/t.nro_perio_calculado)*(t.nro_dias-30)), 2),
+                            if(t.nro_mes>1.01, ROUND(((((ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto)*(t.porcentajesocio/100))/t.nro_perio_calculado)*(t.nro_dias-30)), 2),
 													 ROUND((((t.monto*(t.porcentajesocio/100))/t.nro_perio_calculado)*t.nro_dias), 2)) AS interes_socio,
 
-                           if(t.nro_mes>1.01, ROUND(((((ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto)*(t.porcentajenegocio/100))/t.nro_perio_calculado)*(t.nro_dias-30)), 2), 
+                            if(t.nro_mes>1.01, ROUND(((((ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto)*(t.porcentajenegocio/100))/t.nro_perio_calculado)*(t.nro_dias-30)), 2), 
 													 ROUND((((t.monto*(t.porcentajenegocio/100))/t.nro_perio_calculado)*t.nro_dias), 2) ) AS interes_negocio,
                            
-                           IF(t.nro_mes>1.01, (ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto), t.monto) AS monto 
-                               FROM 
+                            IF(t.nro_mes>1.01, (ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto), t.monto) AS monto 
+                            FROM 
                         (SELECT a.id, a.fecha, a.fechalimite, a.total, a.monto, a.descripcion_bien, a.codigocredito, a.codigocontrato    
                             ,b.numerodocumento, b.nombrescliente, c.tiposervicio,
                             DATEDIFF(CURDATE(),a.fecha) AS nro_dias,
