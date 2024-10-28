@@ -413,7 +413,7 @@ class CreditoController extends Controller
         ->join('empresas AS d', 'creditos.empresa_id','=','d.id')
         ->join('users AS e','creditos.user_id','=','e.id')
         ->join('clientes AS f','creditos.cliente_id','=','f.id')
-        ->where('creditos.estado',1)
+        ->whereIn('creditos.estado', array(1,3))
         ->where('creditos.id', $id)
         ->where('creditos.empresa_id', auth()->user()->empresa_id)
         ->first();
