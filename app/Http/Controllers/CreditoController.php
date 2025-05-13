@@ -58,36 +58,72 @@ class CreditoController extends Controller
 
     public function show($nro_documento, Request $request) {
         if($nro_documento != ""){
-            $creditos = DB::select("SELECT t1.id, t1.fecha, t1.fechalimite, t1.monto, t1.descripcion_bien, t1.numerodocumento, t1.nombrescliente, 
-                    t1.interes_socio, t1.interes_negocio,	t1.nro_dias, t1.tiposervicio, t1.codigocontrato, t1.codigocredito, t1.plazo,
-                    ROUND((t1.interes_socio*0.18),2) AS igv, DATEDIFF(t1.fechalimite, CURDATE()) AS intervalo 
-                    FROM 
-                    (
-                       
-                           SELECT t.id, t.fecha, t.fechalimite, t.descripcion_bien, t.numerodocumento, t.nombrescliente, t.nro_dias, t.codigocontrato, t.codigocredito, t.tiposervicio,
-                           concat(t.nro_perio_calculado, ' días') as plazo,
+            $sql = "SELECT t1.id, t1.fecha, t1.fechalimite, t1.monto, t1.descripcion_bien, t1.numerodocumento, t1.nombrescliente, 
+                        t1.interes_socio, t1.interes_negocio, t1.nro_dias, t1.tiposervicio, t1.codigocontrato, t1.codigocredito, t1.plazo,
+                        ROUND((t1.interes_socio * 0.18), 2) AS igv, DATEDIFF(t1.fechalimite, CURDATE()) AS intervalo 
+                    FROM (
+                        SELECT t.id, t.fecha, t.fechalimite, t.descripcion_bien, t.numerodocumento, t.nombrescliente, 
+                            t.nro_dias, t.codigocontrato, t.codigocredito, t.tiposervicio,
+                            CONCAT(t.nro_perio_calculado, ' días') AS plazo,
 
-                           if(t.nro_mes>1.01, ROUND(((((ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto)*(t.porcentajesocio/100))/t.nro_perio_calculado)*(t.nro_dias-30)), 2),
-													 ROUND((((t.monto*(t.porcentajesocio/100))/t.nro_perio_calculado)*t.nro_dias), 2)) AS interes_socio,
+                            -- Limitar el cálculo del interes_socio a un máximo de 60 días (2.01 meses)
+                            IF(
+                                t.nro_mes > 2.01, 
+                                ROUND(((((ROUND((t.monto * (t.porcentaje / 100)), 2) + t.monto) * (t.porcentajesocio / 100)) / t.nro_perio_calculado) * 60), 2),
+                                IF(
+                                    t.nro_mes > 1.01, 
+                                    ROUND(((((ROUND((t.monto * (t.porcentaje / 100)), 2) + t.monto) * (t.porcentajesocio / 100)) / t.nro_perio_calculado) * (t.nro_dias - 30)), 2),
+                                    ROUND((((t.monto * (t.porcentajesocio / 100)) / t.nro_perio_calculado) * t.nro_dias), 2)
+                                )
+                            ) AS interes_socio,
 
-                           if(t.nro_mes>1.01, ROUND(((((ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto)*(t.porcentajenegocio/100))/t.nro_perio_calculado)*(t.nro_dias-30)), 2), 
-													 ROUND((((t.monto*(t.porcentajenegocio/100))/t.nro_perio_calculado)*t.nro_dias), 2) ) AS interes_negocio,
-                           
-                           IF(t.nro_mes>1.01, (ROUND((t.monto*(t.porcentaje/100)), 2) + t.monto), t.monto) AS monto 
-                               FROM 
-                        (SELECT a.id, a.fecha, a.fechalimite, a.total, a.monto, a.descripcion_bien, a.codigocredito, a.codigocontrato    
-                            ,b.numerodocumento, b.nombrescliente, c.tiposervicio,
-                            DATEDIFF(CURDATE(),a.fecha) AS nro_dias,
-                            ROUND((DATEDIFF(CURDATE(),a.fecha)/30), 2) AS nro_mes,
-                            IF(c.periodo='DIAS', c.numeroperiodo, IF(periodo='SEMANAS', c.numeroperiodo * 7, IF(c.periodo='MES', c.numeroperiodo * 30, 0))) AS nro_perio_calculado,
-                            c.porcentajesocio, c.porcentajenegocio, c.porcentaje
+                            -- Limitar el cálculo del interes_negocio a un máximo de 60 días (2.01 meses)
+                            IF(
+                                t.nro_mes > 2.01,
+                                ROUND(((((ROUND((t.monto * (t.porcentaje / 100)), 2) + t.monto) * (t.porcentajenegocio / 100)) / t.nro_perio_calculado) * 60), 2),
+                                IF(
+                                    t.nro_mes > 1.01,
+                                    ROUND(((((ROUND((t.monto * (t.porcentaje / 100)), 2) + t.monto) * (t.porcentajenegocio / 100)) / t.nro_perio_calculado) * (t.nro_dias - 30)), 2),
+                                    ROUND((((t.monto * (t.porcentajenegocio / 100)) / t.nro_perio_calculado) * t.nro_dias), 2)
+                                )
+                            ) AS interes_negocio,
+
+                            -- Limitar el cálculo del monto a un máximo de 60 días (2.01 meses)
+                            IF(
+                                t.nro_mes > 2.01,
+                                ROUND((t.monto * (t.porcentaje / 100)), 2) + t.monto,
+                                IF(
+                                    t.nro_mes > 1.01,
+                                    (ROUND((t.monto * (t.porcentaje / 100)), 2) + t.monto),
+                                    t.monto
+                                )
+                            ) AS monto 
+                        FROM (
+                            SELECT a.id, a.fecha, a.fechalimite, a.total, a.monto, a.descripcion_bien, a.codigocredito, a.codigocontrato,    
+                                b.numerodocumento, b.nombrescliente, c.tiposervicio,
+                                DATEDIFF(CURDATE(), a.fecha) AS nro_dias,
+                                ROUND((DATEDIFF(CURDATE(), a.fecha) / 30), 2) AS nro_mes,
+                                IF(c.periodo = 'DIAS', c.numeroperiodo, 
+                                    IF(c.periodo = 'SEMANAS', c.numeroperiodo * 7, 
+                                        IF(c.periodo = 'MES', c.numeroperiodo * 30, 0))) AS nro_perio_calculado,
+                                c.porcentajesocio, c.porcentajenegocio, c.porcentaje
                             FROM creditos a 
-                            JOIN clientes b ON a.cliente_id=b.id 
-                            JOIN servicios c ON a.servicio_id=c.id 
-                            WHERE a.estado IN (1,3) AND a.empresa_id=".auth()->user()->empresa_id." and b.numerodocumento='$nro_documento' 
+                            JOIN clientes b ON a.cliente_id = b.id 
+                            JOIN servicios c ON a.servicio_id = c.id 
+                            WHERE a.estado IN (1, 3) AND a.empresa_id=".auth()->user()->empresa_id." and b.numerodocumento='$nro_documento' 
                         ) AS t
-                    ) AS t1");
+                    ) AS t1;";
+            $creditos = DB::select($sql);
         }
+        /**
+         * SELECT IF(
+		*ROUND((DATEDIFF(CURDATE(),'2025-03-12')/30), 2) > 1.01 
+		*AND 
+		*ROUND((DATEDIFF(CURDATE(),'2025-03-12')/30), 2) < 2.01, 
+		*'verdadero', 
+		*'falso'
+	    *)
+         */
 
         return response()->json(
             [
