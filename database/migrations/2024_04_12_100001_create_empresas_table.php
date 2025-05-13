@@ -29,7 +29,6 @@ class CreateEmpresasTable extends Migration
             $table->string('simbolomoneda', 5)->nullable();
             $table->string('rucsocio', 15)->nullable();
             $table->string('razonsocialsocio', 100)->nullable();
-            $table->string('razonsocial', 100)->nullable();
 
             $table->boolean('estado');
 

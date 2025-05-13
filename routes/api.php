@@ -7,6 +7,7 @@ use App\Http\Controllers\CreditoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DetalleCreditoController;
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\GastoController;
 use App\Http\Controllers\PagoAlquilerController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\SaldoAlquilerController;
@@ -107,7 +108,14 @@ Route::middleware('jwt.verify')->group(function () {
     //Dashboard
     Route::get('dashboard/{fecha1}/{fecha2}', [DashboardController::class, 'index']);
 
-    
+    //Gastos
+    Route::get('gastos', [GastoController::class, 'index']);
+    Route::get('gastos/{id}', [GastoController::class, 'show']);
+    Route::get('gastos/{fecha1}/{fecha2}', [GastoController::class, 'indexFilter']);
+    Route::post('gastos', [GastoController::class, 'store']);
+    Route::patch('gastos/{id}', [GastoController::class, 'update']);
+    Route::delete('gastos/{id}', [GastoController::class, 'destroy']);
+
 });
 
 /*Route::group([

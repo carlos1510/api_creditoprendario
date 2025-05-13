@@ -170,14 +170,19 @@ class CajaController extends Controller
             WHERE a.estado=1 AND (a.fecha BETWEEN '$caja->fechaapertura' AND '$fecha_actual') AND a.empresa_id='".auth()->user()->empresa_id."' AND a.user_id=$caja->user_id";
         $result_credito = DB::selectOne($sql_credito);
 
-        /*$sql_gasto = "";
-        $result_gasto = DB::selectOne($sql_gasto);*/
+        $sql_gasto = "SELECT IFNULL(SUM(monto),0) AS total_gastos
+            FROM gastos
+            WHERE estado=1
+            AND (fecha BETWEEN '$caja->fechaapertura' AND '$fecha_actual')
+            AND empresa_id='".auth()->user()->empresa_id."'
+            AND user_id=$caja->user_id";
+        $result_gasto = DB::selectOne($sql_gasto);
 
-        $monto_cierre = ((double)$caja->montoinicial + (double)$result_pago->totalpagos) - (double)$result_credito->total_prestamo;
+        $monto_cierre = ((double)$caja->montoinicial + (double)$result_pago->totalpagos) - ((double)$result_credito->total_prestamo + (double)$result_gasto->total_gastos);
 
         $caja->montocierre = $monto_cierre;
         $caja->montocredito = $result_credito->total_prestamo;
-        $caja->montogasto = 0;
+        $caja->montogasto = $result_gasto->total_gastos;
         $caja->montocobro = $result_pago->totalpagos;
         $caja->totalcapital = $result_pago->totalcapital;
         $caja->interessocio = $result_pago->interessocio;
